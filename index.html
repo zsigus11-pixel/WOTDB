@@ -1,0 +1,1402 @@
+```html
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WOTDB — World of Tanks Database</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#080b10;
+    --panel:#10151d;
+    --panel2:#151b24;
+    --panel3:#1b222d;
+    --border:#29313d;
+    --text:#e8edf3;
+    --muted:#8d98a7;
+    --accent:#ffb300;
+    --green:#55d66b;
+    --red:#ff5c67;
+    --blue:#54a9ff;
+    --purple:#b36cff;
+    --shadow:0 15px 45px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    background:
+        radial-gradient(circle at 20% 0%,rgba(255,179,0,.07),transparent 30%),
+        radial-gradient(circle at 90% 10%,rgba(84,169,255,.05),transparent 30%),
+        var(--bg);
+    color:var(--text);
+    font-family:"Rajdhani",sans-serif;
+}
+
+button,input,select{font-family:inherit}
+button{cursor:pointer}
+
+.header{
+    height:68px;
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:rgba(8,11,16,.95);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+}
+
+.header-inner{
+    max-width:1550px;
+    height:100%;
+    margin:auto;
+    padding:0 22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:26px;
+    font-weight:700;
+}
+
+.logo-box{
+    width:38px;
+    height:38px;
+    display:grid;
+    place-items:center;
+    border:2px solid var(--accent);
+    color:var(--accent);
+    transform:skew(-8deg);
+}
+
+.logo span{color:var(--accent)}
+
+.nav{
+    display:flex;
+    gap:6px;
+}
+
+.nav button{
+    background:transparent;
+    border:0;
+    color:var(--muted);
+    padding:10px 15px;
+    font-weight:700;
+}
+
+.nav button:hover,
+.nav button.active{
+    color:var(--accent);
+}
+
+.container{
+    max-width:1550px;
+    margin:auto;
+    padding:36px 22px 70px;
+}
+
+.hero h1{
+    margin:0;
+    font-size:48px;
+    line-height:1;
+    text-transform:uppercase;
+}
+
+.hero h1 span{color:var(--accent)}
+
+.hero p{
+    margin:10px 0 25px;
+    color:var(--muted);
+    font-size:18px;
+}
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.summary-card{
+    background:linear-gradient(145deg,var(--panel2),var(--panel));
+    border:1px solid var(--border);
+    padding:17px;
+    box-shadow:var(--shadow);
+}
+
+.summary-label{
+    color:var(--muted);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.summary-value{
+    font-size:29px;
+    font-weight:700;
+    margin-top:4px;
+}
+
+.accent{color:var(--accent)}
+
+.filter-panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    padding:18px;
+    margin-bottom:18px;
+    box-shadow:var(--shadow);
+}
+
+.filter-grid{
+    display:grid;
+    grid-template-columns:2fr repeat(5,1fr);
+    gap:10px;
+}
+
+.field label{
+    display:block;
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:5px;
+    text-transform:uppercase;
+}
+
+.field input,
+.field select{
+    width:100%;
+    height:42px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:0 12px;
+    outline:none;
+}
+
+.field input:focus,
+.field select:focus{
+    border-color:var(--accent);
+}
+
+.quick-tiers{
+    display:flex;
+    gap:7px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
+
+.quick-tiers button{
+    min-width:43px;
+    height:34px;
+    background:var(--panel2);
+    color:var(--muted);
+    border:1px solid var(--border);
+    font-weight:700;
+}
+
+.quick-tiers button:hover,
+.quick-tiers button.active{
+    background:var(--accent);
+    color:#111;
+    border-color:var(--accent);
+}
+
+.table-wrap{
+    background:var(--panel);
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+}
+
+.table-top{
+    min-height:56px;
+    padding:0 17px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.results{color:var(--muted)}
+.results strong{color:var(--text)}
+
+.table-scroll{overflow-x:auto}
+
+table{
+    width:100%;
+    min-width:1450px;
+    border-collapse:collapse;
+}
+
+thead{background:#0c1016}
+
+th{
+    padding:12px 9px;
+    text-align:right;
+    color:#9ca7b6;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+}
+
+th:nth-child(-n+4){text-align:left}
+
+th.sortable{cursor:pointer}
+th.sortable:hover{color:var(--accent)}
+
+tbody tr{
+    border-bottom:1px solid rgba(41,49,61,.7);
+}
+
+tbody tr:hover{
+    background:rgba(255,179,0,.035);
+}
+
+td{
+    padding:12px 9px;
+    text-align:right;
+    white-space:nowrap;
+}
+
+td:nth-child(-n+4){text-align:left}
+
+.tank-cell{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.tank-icon{
+    width:58px;
+    height:36px;
+    object-fit:contain;
+    background:#090d13;
+    border:1px solid var(--border);
+}
+
+.tank-name{
+    color:var(--text);
+    font-size:17px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.tank-name:hover{color:var(--accent)}
+
+.tank-meta{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.type{font-weight:700}
+.type-HT{color:#ff626d}
+.type-MT{color:#55d66b}
+.type-LT{color:#54a9ff}
+.type-TD{color:#b36cff}
+.type-SPG{color:#ffb300}
+
+.tier{
+    display:inline-flex;
+    width:30px;
+    height:30px;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--border);
+    background:#0b1017;
+    font-weight:700;
+}
+
+.tier-XI{color:#ffcf54;border-color:#826b2e}
+
+.premium{
+    display:inline-block;
+    padding:2px 6px;
+    margin-left:5px;
+    border:1px solid #6d5724;
+    color:var(--accent);
+    font-size:10px;
+    font-weight:700;
+}
+
+.good{color:var(--green)}
+.bad{color:var(--red)}
+.blue{color:var(--blue)}
+.purple{color:var(--purple)}
+
+.state{
+    padding:65px 20px;
+    text-align:center;
+    color:var(--muted);
+}
+
+.loader{
+    width:35px;
+    height:35px;
+    margin:0 auto 15px;
+    border:3px solid var(--border);
+    border-top-color:var(--accent);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg)}
+}
+
+.error{color:var(--red)}
+
+.modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:500;
+    background:rgba(0,0,0,.8);
+    backdrop-filter:blur(7px);
+    padding:20px;
+    overflow:auto;
+}
+
+.modal-overlay.show{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.modal{
+    width:min(1000px,100%);
+    background:var(--panel);
+    border:1px solid var(--border);
+    box-shadow:0 30px 100px rgba(0,0,0,.7);
+}
+
+.modal-header{
+    padding:24px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+}
+
+.modal-title{
+    font-size:36px;
+    font-weight:700;
+}
+
+.modal-subtitle{
+    color:var(--muted);
+}
+
+.close{
+    width:40px;
+    height:40px;
+    background:var(--panel2);
+    color:var(--muted);
+    border:1px solid var(--border);
+    font-size:22px;
+}
+
+.close:hover{
+    color:var(--accent);
+    border-color:var(--accent);
+}
+
+.modal-body{padding:24px}
+
+.modal-stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+.modal-stat{
+    background:var(--panel2);
+    border:1px solid var(--border);
+    padding:14px;
+}
+
+.modal-stat label{
+    display:block;
+    color:var(--muted);
+    font-size:12px;
+    text-transform:uppercase;
+}
+
+.modal-stat strong{
+    display:block;
+    margin-top:3px;
+    font-size:25px;
+}
+
+.section-title{
+    margin:26px 0 12px;
+    color:var(--accent);
+    font-size:18px;
+    text-transform:uppercase;
+}
+
+.performance{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px 25px;
+}
+
+.performance-row{
+    display:grid;
+    grid-template-columns:120px 1fr 65px;
+    gap:8px;
+    align-items:center;
+}
+
+.performance-row span:first-child{color:var(--muted)}
+
+.bar{
+    height:7px;
+    background:#080c11;
+}
+
+.bar div{
+    height:100%;
+    background:var(--accent);
+}
+
+.description{
+    color:#b8c1cc;
+    line-height:1.6;
+}
+
+.footer{
+    text-align:center;
+    color:#5f6976;
+    padding:30px;
+    border-top:1px solid var(--border);
+}
+
+@media(max-width:1100px){
+    .summary{grid-template-columns:repeat(3,1fr)}
+    .filter-grid{grid-template-columns:repeat(3,1fr)}
+    .filter-grid .field:first-child{grid-column:1/-1}
+}
+
+@media(max-width:700px){
+    .header{height:auto}
+    .header-inner{
+        padding:12px 15px;
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .nav{
+        width:100%;
+        overflow-x:auto;
+    }
+
+    .container{padding:25px 12px 50px}
+
+    .hero h1{font-size:35px}
+
+    .summary{grid-template-columns:1fr 1fr}
+
+    .filter-grid{grid-template-columns:1fr}
+    .filter-grid .field:first-child{grid-column:auto}
+
+    .modal-stats{grid-template-columns:1fr 1fr}
+    .performance{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+<div class="header-inner">
+
+    <div class="logo">
+        <div class="logo-box">W</div>
+        WOT<span>DB</span>
+    </div>
+
+    <nav class="nav">
+        <button class="active">Tank Stats</button>
+        <button onclick="scrollToTable()">Tanks</button>
+        <button onclick="resetFilters()">Reset</button>
+    </nav>
+
+</div>
+</header>
+
+<main class="container">
+
+<section class="hero">
+    <h1>Tank <span>Stats</span></h1>
+    <p>World of Tanks tank adatbázis és teljesítmény-összehasonlító.</p>
+</section>
+
+<section class="summary">
+
+    <div class="summary-card">
+        <div class="summary-label">Összes tank</div>
+        <div class="summary-value accent" id="totalTanks">0</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">Találatok</div>
+        <div class="summary-value" id="visibleTanks">0</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">Átlag WR</div>
+        <div class="summary-value" id="avgWR">0%</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">Átlag DPG</div>
+        <div class="summary-value" id="avgDPG">0</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">Legtöbb csata</div>
+        <div class="summary-value" id="mostPlayed">—</div>
+    </div>
+
+</section>
+
+<section class="filter-panel">
+
+<div class="filter-grid">
+
+    <div class="field">
+        <label>Keresés</label>
+        <input id="search" placeholder="Tank neve vagy nemzet..." autocomplete="off">
+    </div>
+
+    <div class="field">
+        <label>Nemzet</label>
+        <select id="nation">
+            <option value="">Összes</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label>Típus</label>
+        <select id="type">
+            <option value="">Összes</option>
+            <option value="HT">Heavy Tank</option>
+            <option value="MT">Medium Tank</option>
+            <option value="LT">Light Tank</option>
+            <option value="TD">Tank Destroyer</option>
+            <option value="SPG">SPG</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label>Tier</label>
+        <select id="tier">
+            <option value="">Összes</option>
+            <option>XI</option>
+            <option>X</option>
+            <option>IX</option>
+            <option>VIII</option>
+            <option>VII</option>
+            <option>VI</option>
+            <option>V</option>
+            <option>IV</option>
+            <option>III</option>
+            <option>II</option>
+            <option>I</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label>Elérhetőség</label>
+        <select id="availability">
+            <option value="">Mind</option>
+            <option value="standard">Tech Tree</option>
+            <option value="premium">Premium</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label>Rendezés</label>
+        <select id="sortSelect">
+            <option value="name">Név</option>
+            <option value="tier">Tier</option>
+            <option value="dpm">DPM</option>
+            <option value="damage">Damage</option>
+            <option value="penetration">Pen</option>
+            <option value="winRate">Win Rate</option>
+            <option value="wn8">WN8</option>
+            <option value="dpg">DPG</option>
+            <option value="battles">Battles</option>
+            <option value="speedForward">Speed</option>
+            <option value="viewRange">View Range</option>
+            <option value="health">HP</option>
+        </select>
+    </div>
+
+</div>
+
+<div class="quick-tiers">
+    <button class="active" data-tier="">ALL</button>
+    <button data-tier="XI">XI</button>
+    <button data-tier="X">X</button>
+    <button data-tier="IX">IX</button>
+    <button data-tier="VIII">VIII</button>
+    <button data-tier="VII">VII</button>
+    <button data-tier="VI">VI</button>
+    <button data-tier="V">V</button>
+</div>
+
+</section>
+
+<section class="table-wrap" id="tankTable">
+
+<div class="table-top">
+    <div class="results">
+        <strong id="resultCount">0</strong> tank található
+    </div>
+
+    <div class="results">
+        WOTDB Database
+    </div>
+</div>
+
+<div class="table-scroll">
+
+<table>
+
+<thead>
+<tr>
+    <th>Nation</th>
+    <th>Type</th>
+    <th>Tier</th>
+    <th>Tank</th>
+    <th class="sortable" data-sort="dpm">DPM</th>
+    <th class="sortable" data-sort="damage">Damage</th>
+    <th class="sortable" data-sort="reload">Reload</th>
+    <th class="sortable" data-sort="penetration">Pen</th>
+    <th>Velocity</th>
+    <th>Accuracy</th>
+    <th>Aim</th>
+    <th>Dep.</th>
+    <th class="sortable" data-sort="speedForward">Speed</th>
+    <th>Traverse</th>
+    <th>P/W</th>
+    <th class="sortable" data-sort="viewRange">View</th>
+    <th class="sortable" data-sort="health">HP</th>
+    <th class="sortable" data-sort="winRate">WR</th>
+    <th class="sortable" data-sort="wn8">WN8</th>
+    <th class="sortable" data-sort="dpg">DPG</th>
+</tr>
+</thead>
+
+<tbody id="tankBody">
+<tr>
+<td colspan="20">
+<div class="state">
+    <div class="loader"></div>
+    Adatbázis betöltése...
+</div>
+</td>
+</tr>
+</tbody>
+
+</table>
+
+</div>
+</section>
+
+</main>
+
+<footer class="footer">
+    WOTDB — World of Tanks Database
+</footer>
+
+
+<div class="modal-overlay" id="modal">
+
+<div class="modal">
+
+<div class="modal-header">
+
+<div>
+    <div class="modal-title" id="modalName">Tank</div>
+    <div class="modal-subtitle" id="modalSubtitle"></div>
+</div>
+
+<button class="close" onclick="closeModal()">×</button>
+
+</div>
+
+<div class="modal-body">
+
+<div class="modal-stats">
+
+<div class="modal-stat">
+<label>DPM</label>
+<strong id="mDpm">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>Damage</label>
+<strong id="mDamage">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>Penetration</label>
+<strong id="mPen">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>Reload</label>
+<strong id="mReload">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>Win Rate</label>
+<strong id="mWR">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>WN8</label>
+<strong id="mWN8">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>DPG</label>
+<strong id="mDPG">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>Battles</label>
+<strong id="mBattles">—</strong>
+</div>
+
+</div>
+
+<div class="section-title">Teljesítmény</div>
+
+<div class="performance">
+
+<div class="performance-row">
+<span>Win Rate</span>
+<div class="bar"><div id="barWR"></div></div>
+<span id="pWR">0</span>
+</div>
+
+<div class="performance-row">
+<span>WN8</span>
+<div class="bar"><div id="barWN8"></div></div>
+<span id="pWN8">0</span>
+</div>
+
+<div class="performance-row">
+<span>DPG</span>
+<div class="bar"><div id="barDPG"></div></div>
+<span id="pDPG">0</span>
+</div>
+
+<div class="performance-row">
+<span>Frags</span>
+<div class="bar"><div id="barFrags"></div></div>
+<span id="pFrags">0</span>
+</div>
+
+</div>
+
+<div class="section-title">Jármű adatok</div>
+
+<div class="modal-stats">
+
+<div class="modal-stat">
+<label>Max Speed</label>
+<strong id="mSpeed">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>Reverse</label>
+<strong id="mReverse">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>View Range</label>
+<strong id="mView">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>HP</label>
+<strong id="mHP">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>Weight</label>
+<strong id="mWeight">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>Engine Power</label>
+<strong id="mPower">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>Power / Weight</label>
+<strong id="mPW">—</strong>
+</div>
+
+<div class="modal-stat">
+<label>Traverse</label>
+<strong id="mTraverse">—</strong>
+</div>
+
+</div>
+
+<div class="section-title">Leírás</div>
+
+<div class="description" id="mDescription">—</div>
+
+</div>
+</div>
+</div>
+
+
+<script>
+
+let tanks=[];
+let filteredTanks=[];
+
+let currentSort="name";
+let sortDirection=1;
+let currentTier="";
+
+
+async function loadDatabase(){
+
+    const body=document.getElementById("tankBody");
+
+    try{
+
+        const response=await fetch("tanks.json",{cache:"no-store"});
+
+        if(!response.ok)
+            throw new Error("HTTP "+response.status);
+
+        tanks=await response.json();
+
+        if(!Array.isArray(tanks))
+            throw new Error("A tanks.json formátuma hibás.");
+
+        document.getElementById("totalTanks").textContent=tanks.length;
+
+        populateNations();
+        applyFilters();
+
+    }catch(error){
+
+        console.error(error);
+
+        body.innerHTML=`
+        <tr>
+        <td colspan="20">
+        <div class="state error">
+            <h2>Nem sikerült betölteni az adatbázist</h2>
+            <p>${escapeHtml(error.message)}</p>
+            <p>Ellenőrizd, hogy a tanks.json az index.html mellett található-e.</p>
+        </div>
+        </td>
+        </tr>`;
+    }
+}
+
+
+function populateNations(){
+
+    const select=document.getElementById("nation");
+
+    [...new Set(tanks.map(t=>t.nation))]
+        .sort((a,b)=>a.localeCompare(b,"hu"))
+        .forEach(nation=>{
+
+            const option=document.createElement("option");
+
+            option.value=nation;
+            option.textContent=nation;
+
+            select.appendChild(option);
+        });
+}
+
+
+function applyFilters(){
+
+    const search=document.getElementById("search")
+        .value.trim().toLowerCase();
+
+    const nation=document.getElementById("nation").value;
+    const type=document.getElementById("type").value;
+
+    const tier=currentTier ||
+        document.getElementById("tier").value;
+
+    const availability=document.getElementById("availability").value;
+
+
+    filteredTanks=tanks.filter(tank=>{
+
+        const text=[
+            tank.name,
+            tank.nation,
+            tank.type
+        ].join(" ").toLowerCase();
+
+        if(search && !text.includes(search))
+            return false;
+
+        if(nation && tank.nation!==nation)
+            return false;
+
+        if(type && tank.type!==type)
+            return false;
+
+        if(tier && tank.tier!==tier)
+            return false;
+
+        if(availability==="premium" && !tank.premium)
+            return false;
+
+        if(availability==="standard" && tank.premium)
+            return false;
+
+        return true;
+    });
+
+    sortTanks();
+    renderTable();
+    updateSummary();
+}
+
+
+function sortTanks(){
+
+    const tierOrder={
+        I:1,II:2,III:3,IV:4,V:5,
+        VI:6,VII:7,VIII:8,IX:9,X:10,XI:11
+    };
+
+    filteredTanks.sort((a,b)=>{
+
+        let av=a[currentSort];
+        let bv=b[currentSort];
+
+        if(currentSort==="tier"){
+            av=tierOrder[a.tier]||0;
+            bv=tierOrder[b.tier]||0;
+        }
+
+        if(typeof av==="string")
+            return av.localeCompare(bv,"hu")*sortDirection;
+
+        return ((Number(av)||0)-(Number(bv)||0))*sortDirection;
+    });
+}
+
+
+function renderTable(){
+
+    const body=document.getElementById("tankBody");
+
+    document.getElementById("resultCount")
+        .textContent=filteredTanks.length;
+
+    if(!filteredTanks.length){
+
+        body.innerHTML=`
+        <tr>
+        <td colspan="20">
+        <div class="state">
+            Nincs találat.
+        </div>
+        </td>
+        </tr>`;
+
+        return;
+    }
+
+
+    body.innerHTML=filteredTanks.map(tank=>{
+
+        const wrClass=tank.winRate>=50?"good":"bad";
+
+        const wn8Class=
+            tank.wn8>=1600
+            ?"good"
+            :tank.wn8>=1000
+            ?"blue"
+            :"bad";
+
+
+        return `
+        <tr>
+
+        <td>${escapeHtml(tank.nation)}</td>
+
+        <td>
+            <span class="type type-${tank.type}">
+                ${tank.type}
+            </span>
+        </td>
+
+        <td>
+            <span class="tier tier-${tank.tier}">
+                ${tank.tier}
+            </span>
+        </td>
+
+        <td>
+
+        <div class="tank-cell">
+
+        ${
+            tank.icon
+            ? `<img class="tank-icon"
+                    src="${escapeAttr(tank.icon)}"
+                    onerror="this.style.display='none'"
+                    alt="">`
+            : ""
+        }
+
+        <div>
+
+        <div class="tank-name"
+             onclick="openTank('${escapeAttr(tank.id)}')">
+
+            ${escapeHtml(tank.name)}
+
+            ${
+                tank.premium
+                ? `<span class="premium">PREMIUM</span>`
+                : ""
+            }
+
+        </div>
+
+        <div class="tank-meta">
+            ${escapeHtml(tank.nation)}
+        </div>
+
+        </div>
+
+        </div>
+
+        </td>
+
+        <td class="good">${format(tank.dpm)}</td>
+        <td>${format(tank.damage)}</td>
+        <td>${format(tank.reload,1)} s</td>
+        <td class="blue">${format(tank.penetration)}</td>
+        <td>${format(tank.shellVelocity)}</td>
+        <td>${format(tank.accuracy,2)}</td>
+        <td>${format(tank.aimTime,1)} s</td>
+        <td>${format(tank.depression,1)}°</td>
+        <td class="good">${format(tank.speedForward)} km/h</td>
+        <td>${format(tank.hullTraverse,1)}°</td>
+        <td>${format(tank.powerWeight,2)}</td>
+        <td>${format(tank.viewRange)} m</td>
+        <td>${format(tank.health)}</td>
+        <td class="${wrClass}">${format(tank.winRate,2)}%</td>
+        <td class="${wn8Class}">${format(tank.wn8)}</td>
+        <td>${format(tank.dpg)}</td>
+
+        </tr>`;
+    }).join("");
+}
+
+
+function updateSummary(){
+
+    const count=filteredTanks.length;
+
+    document.getElementById("visibleTanks")
+        .textContent=count;
+
+    if(!count){
+        document.getElementById("avgWR").textContent="0%";
+        document.getElementById("avgDPG").textContent="0";
+        document.getElementById("mostPlayed").textContent="—";
+        return;
+    }
+
+    const avgWR=
+        filteredTanks.reduce(
+            (s,t)=>s+Number(t.winRate||0),0
+        )/count;
+
+    const avgDPG=
+        filteredTanks.reduce(
+            (s,t)=>s+Number(t.dpg||0),0
+        )/count;
+
+    const mostPlayed=[...filteredTanks]
+        .sort((a,b)=>
+            Number(b.battles||0)-Number(a.battles||0)
+        )[0];
+
+    document.getElementById("avgWR")
+        .textContent=avgWR.toFixed(2)+"%";
+
+    document.getElementById("avgDPG")
+        .textContent=Math.round(avgDPG);
+
+    document.getElementById("mostPlayed")
+        .textContent=mostPlayed
+            ?mostPlayed.name
+            :"—";
+}
+
+
+function openTank(id){
+
+    const tank=tanks.find(
+        t=>String(t.id)===String(id)
+    );
+
+    if(!tank)return;
+
+    document.getElementById("modalName")
+        .textContent=tank.name;
+
+    document.getElementById("modalSubtitle")
+        .textContent=
+        `${tank.nation} • ${tank.type} • Tier ${tank.tier}`+
+        (tank.premium?" • Premium":"");
+
+    set("mDpm",format(tank.dpm));
+    set("mDamage",format(tank.damage));
+    set("mPen",format(tank.penetration));
+    set("mReload",format(tank.reload,1)+" s");
+
+    set("mWR",format(tank.winRate,2)+"%");
+    set("mWN8",format(tank.wn8));
+    set("mDPG",format(tank.dpg));
+    set("mBattles",format(tank.battles));
+
+    set("mSpeed",format(tank.speedForward)+" km/h");
+    set("mReverse",format(tank.speedBackward)+" km/h");
+    set("mView",format(tank.viewRange)+" m");
+    set("mHP",format(tank.health));
+
+    set("mWeight",format(tank.weight,1)+" t");
+    set("mPower",format(tank.power)+" hp");
+    set("mPW",format(tank.powerWeight,2));
+    set("mTraverse",format(tank.hullTraverse,1)+"°");
+
+    set("mDescription",tank.description||"Nincs leírás.");
+
+    performance("barWR","pWR",tank.winRate||0,60);
+    performance("barWN8","pWN8",tank.wn8||0,3000);
+    performance("barDPG","pDPG",tank.dpg||0,3000);
+    performance("barFrags","pFrags",tank.frags||0,5);
+
+    document.getElementById("modal")
+        .classList.add("show");
+}
+
+
+function closeModal(){
+    document.getElementById("modal")
+        .classList.remove("show");
+}
+
+
+document.getElementById("modal")
+.addEventListener("click",e=>{
+    if(e.target===document.getElementById("modal"))
+        closeModal();
+});
+
+
+document.addEventListener("keydown",e=>{
+    if(e.key==="Escape")
+        closeModal();
+});
+
+
+function performance(bar,text,value,max){
+
+    const percent=Math.min(
+        100,
+        Math.max(0,(Number(value)/max)*100)
+    );
+
+    document.getElementById(bar)
+        .style.width=percent+"%";
+
+    document.getElementById(text)
+        .textContent=
+        Number(value).toLocaleString("hu-HU");
+}
+
+
+function set(id,value){
+    document.getElementById(id).textContent=value;
+}
+
+
+function format(value,decimals=0){
+
+    if(value===undefined||value===null||value==="")
+        return "—";
+
+    return Number(value).toLocaleString(
+        "hu-HU",
+        {
+            minimumFractionDigits:decimals,
+            maximumFractionDigits:decimals
+        }
+    );
+}
+
+
+function escapeHtml(value){
+
+    return String(value??"")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+
+function escapeAttr(value){
+
+    return String(value??"")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+
+document.querySelectorAll("th.sortable")
+.forEach(th=>{
+
+    th.addEventListener("click",()=>{
+
+        const sort=th.dataset.sort;
+
+        if(currentSort===sort)
+            sortDirection*=-1;
+        else{
+            currentSort=sort;
+            sortDirection=-1;
+        }
+
+        sortTanks();
+        renderTable();
+    });
+});
+
+
+[
+    "search",
+    "nation",
+    "type",
+    "tier",
+    "availability"
+].forEach(id=>{
+
+    document.getElementById(id)
+    .addEventListener(
+        id==="search"?"input":"change",
+        ()=>{
+            if(id==="tier"){
+                currentTier="";
+                updateQuickButtons();
+            }
+
+            applyFilters();
+        }
+    );
+});
+
+
+document.getElementById("sortSelect")
+.addEventListener("change",function(){
+
+    currentSort=this.value;
+    sortDirection=-1;
+
+    sortTanks();
+    renderTable();
+});
+
+
+document.querySelectorAll(".quick-tiers button")
+.forEach(button=>{
+
+    button.addEventListener("click",()=>{
+
+        currentTier=button.dataset.tier;
+
+        document.getElementById("tier")
+            .value=currentTier;
+
+        updateQuickButtons();
+        applyFilters();
+    });
+});
+
+
+function updateQuickButtons(){
+
+    document.querySelectorAll(".quick-tiers button")
+    .forEach(button=>{
+        button.classList.toggle(
+            "active",
+            button.dataset.tier===currentTier
+        );
+    });
+}
+
+
+function resetFilters(){
+
+    document.getElementById("search").value="";
+    document.getElementById("nation").value="";
+    document.getElementById("type").value="";
+    document.getElementById("tier").value="";
+    document.getElementById("availability").value="";
+
+    currentTier="";
+    currentSort="name";
+    sortDirection=1;
+
+    updateQuickButtons();
+    applyFilters();
+}
+
+
+function scrollToTable(){
+
+    document.getElementById("tankTable")
+        .scrollIntoView({
+            behavior:"smooth"
+        });
+}
+
+
+loadDatabase();
+
+</script>
+
+</body>
+</html>
+```
