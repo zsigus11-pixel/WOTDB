@@ -7,6 +7,7 @@
 <title>WOTDB – World of Tanks Database</title>
 
 <style>
+
 :root{
     --bg:#10151b;
     --panel:#171e26;
@@ -23,6 +24,10 @@
 
 *{
     box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
 }
 
 body{
@@ -42,7 +47,10 @@ button{
     cursor:pointer;
 }
 
-/* HEADER */
+
+/* =========================
+   HEADER
+========================= */
 
 header{
     height:68px;
@@ -96,15 +104,21 @@ header{
     font-size:13px;
 }
 
-/* MAIN */
+
+/* =========================
+   MAIN
+========================= */
 
 main{
     max-width:1400px;
     margin:auto;
-    padding:30px 24px 80px;
+    padding:30px 24px 100px;
 }
 
-/* HERO */
+
+/* =========================
+   HERO
+========================= */
 
 .hero{
     background:var(--panel);
@@ -125,7 +139,10 @@ main{
     font-size:15px;
 }
 
-/* FILTERS */
+
+/* =========================
+   FILTERS
+========================= */
 
 .filters{
     background:var(--panel);
@@ -139,10 +156,6 @@ main{
     display:grid;
     grid-template-columns:2fr repeat(5,1fr);
     gap:10px;
-}
-
-.search{
-    position:relative;
 }
 
 .search input,
@@ -176,7 +189,10 @@ select:focus{
     border-color:var(--accent);
 }
 
-/* RESULTS */
+
+/* =========================
+   RESULTS
+========================= */
 
 .results-head{
     display:flex;
@@ -194,13 +210,21 @@ select:focus{
     color:white;
 }
 
-/* CARDS */
+
+/* =========================
+   TANK GRID
+========================= */
 
 .tank-grid{
     display:grid;
     grid-template-columns:repeat(4,1fr);
     gap:14px;
 }
+
+
+/* =========================
+   TANK CARD
+========================= */
 
 .tank-card{
     background:var(--panel);
@@ -216,17 +240,18 @@ select:focus{
 }
 
 .tank-image{
-    height:220px;
+    height:190px;
     background:#11171e;
     display:flex;
     align-items:center;
     justify-content:center;
     border-bottom:1px solid var(--border);
+    overflow:hidden;
 }
 
 .tank-image img{
     max-width:100%;
-    max-height:205px;
+    max-height:175px;
     width:auto;
     height:auto;
     object-fit:contain;
@@ -240,6 +265,9 @@ select:focus{
     font-size:17px;
     font-weight:700;
     margin-bottom:6px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 .tank-meta{
@@ -319,7 +347,10 @@ select:focus{
     background:var(--accent2);
 }
 
-/* EMPTY */
+
+/* =========================
+   EMPTY
+========================= */
 
 .empty{
     background:var(--panel);
@@ -330,7 +361,10 @@ select:focus{
     color:var(--muted);
 }
 
-/* COMPARISON BAR */
+
+/* =========================
+   COMPARE BAR
+========================= */
 
 .compare-bar{
     position:fixed;
@@ -384,9 +418,13 @@ select:focus{
     border:0;
     border-radius:6px;
     padding:9px 15px;
+    white-space:nowrap;
 }
 
-/* MODALS */
+
+/* =========================
+   MODALS
+========================= */
 
 .modal{
     position:fixed;
@@ -419,6 +457,10 @@ select:focus{
     display:flex;
     justify-content:space-between;
     align-items:center;
+    position:sticky;
+    top:0;
+    background:#171e26;
+    z-index:2;
 }
 
 .modal-header h2{
@@ -431,6 +473,7 @@ select:focus{
     background:transparent;
     color:var(--muted);
     font-size:25px;
+    line-height:1;
 }
 
 .close:hover{
@@ -441,7 +484,10 @@ select:focus{
     padding:20px;
 }
 
-/* DETAIL */
+
+/* =========================
+   DETAIL
+========================= */
 
 .detail-top{
     display:grid;
@@ -504,10 +550,14 @@ select:focus{
     font-size:14px;
 }
 
-/* COMPARISON TABLE */
+
+/* =========================
+   COMPARISON TABLE
+========================= */
 
 .table-wrap{
-    overflow:auto;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
 }
 
 .compare-table{
@@ -549,7 +599,10 @@ select:focus{
     text-align:left !important;
 }
 
-/* FOOTER */
+
+/* =========================
+   FOOTER
+========================= */
 
 footer{
     text-align:center;
@@ -558,9 +611,13 @@ footer{
     padding:25px;
 }
 
-/* RESPONSIVE */
+
+/* =========================
+   TABLET
+========================= */
 
 @media(max-width:1100px){
+
     .tank-grid{
         grid-template-columns:repeat(3,1fr);
     }
@@ -568,236 +625,716 @@ footer{
     .filter-row{
         grid-template-columns:repeat(3,1fr);
     }
+
 }
 
+
+/* =========================
+   MOBILE
+========================= */
+
 @media(max-width:750px){
+
     header{
-        padding:0 15px;
+        height:60px;
+        padding:0 14px;
     }
 
     .header-info{
         display:none;
     }
 
-    main{
-        padding:20px 12px 90px;
+    .logo-mark{
+        width:34px;
+        height:34px;
+        font-size:16px;
     }
 
+    .logo-text{
+        font-size:19px;
+    }
+
+    main{
+        padding:16px 10px 100px;
+    }
+
+
+    /* HERO */
+
     .hero{
-        padding:20px;
+        padding:18px;
+        margin-bottom:14px;
     }
 
     .hero h1{
-        font-size:24px;
+        font-size:22px;
     }
 
-    .tank-grid{
-        grid-template-columns:repeat(2,1fr);
+    .hero p{
+        font-size:13px;
+        line-height:1.5;
+    }
+
+
+    /* FILTERS */
+
+    .filters{
+        padding:12px;
+        margin-bottom:16px;
     }
 
     .filter-row{
         grid-template-columns:1fr 1fr;
+        gap:8px;
     }
+
+    .search{
+        grid-column:1 / -1;
+    }
+
+    .search input,
+    select{
+        height:40px;
+        font-size:13px;
+    }
+
+
+    /* TANK GRID */
+
+    .tank-grid{
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+    }
+
+
+    /* TANK IMAGE */
+
+    .tank-image{
+        height:145px;
+    }
+
+    .tank-image img{
+        max-height:135px;
+        max-width:100%;
+    }
+
+
+    /* CARD */
+
+    .tank-content{
+        padding:9px;
+    }
+
+    .tank-name{
+        font-size:13px;
+        margin-bottom:5px;
+    }
+
+    .tank-meta{
+        gap:3px;
+        margin-bottom:8px;
+    }
+
+    .badge{
+        font-size:9px;
+        padding:3px 5px;
+    }
+
+
+    /* STATS */
+
+    .stats{
+        grid-template-columns:1fr 1fr;
+        gap:5px;
+        margin-bottom:8px;
+    }
+
+    .stats .stat:last-child{
+        grid-column:1 / -1;
+    }
+
+    .stat{
+        padding:6px;
+    }
+
+    .stat-label{
+        font-size:9px;
+    }
+
+    .stat-value{
+        font-size:11px;
+    }
+
+
+    /* BUTTONS */
+
+    .card-buttons{
+        grid-template-columns:1fr;
+        gap:5px;
+    }
+
+    .btn{
+        padding:7px 4px;
+        font-size:10px;
+    }
+
+
+    /* DETAILS */
 
     .detail-top{
         grid-template-columns:1fr;
+        gap:12px;
+    }
+
+    .detail-image{
+        min-height:145px;
+    }
+
+    .detail-image img{
+        max-height:140px;
+    }
+
+    .detail-description{
+        font-size:13px;
     }
 
     .detail-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-}
-
-@media(max-width:500px){
-    .tank-grid{
-        grid-template-columns:1fr;
+        grid-template-columns:1fr 1fr;
     }
 
-    .filter-row{
-        grid-template-columns:1fr;
+    .detail-stat{
+        padding:8px;
+    }
+
+    .detail-stat small{
+        font-size:10px;
+    }
+
+    .detail-stat strong{
+        font-size:12px;
+    }
+
+
+    /* COMPARE BAR */
+
+    .compare-bar{
+        padding:8px 10px;
     }
 
     .compare-inner{
-        gap:8px;
+        gap:7px;
     }
 
     .compare-title{
         display:none;
     }
 
-    .compare-action{
-        padding:8px 10px;
+    .compare-items{
+        gap:5px;
+        min-width:0;
     }
+
+    .compare-item{
+        font-size:10px;
+        padding:6px 7px;
+    }
+
+    .compare-action{
+        padding:8px 9px;
+        font-size:11px;
+    }
+
+
+    /* MODAL */
+
+    .modal{
+        padding:8px;
+        align-items:flex-end;
+    }
+
+    .modal-box{
+        max-height:94vh;
+        border-radius:10px 10px 0 0;
+    }
+
+    .modal-header{
+        padding:14px;
+    }
+
+    .modal-header h2{
+        font-size:17px;
+    }
+
+    .modal-body{
+        padding:14px;
+    }
+
 }
+
+
+/* =========================
+   SMALL PHONE
+========================= */
+
+@media(max-width:420px){
+
+    .tank-grid{
+        grid-template-columns:1fr 1fr;
+        gap:6px;
+    }
+
+    .tank-image{
+        height:125px;
+    }
+
+    .tank-image img{
+        max-height:115px;
+    }
+
+    .tank-content{
+        padding:7px;
+    }
+
+    .tank-name{
+        font-size:12px;
+    }
+
+    .badge{
+        font-size:8px;
+        padding:3px 4px;
+    }
+
+    .stat{
+        padding:5px;
+    }
+
+    .stat-label{
+        font-size:8px;
+    }
+
+    .stat-value{
+        font-size:10px;
+    }
+
+    .btn{
+        font-size:9px;
+        padding:6px 3px;
+    }
+
+    .detail-grid{
+        grid-template-columns:1fr 1fr;
+        gap:6px;
+    }
+
+}
+
+
+/* =========================
+   VERY SMALL PHONE
+========================= */
+
+@media(max-width:340px){
+
+    .tank-image{
+        height:110px;
+    }
+
+    .tank-image img{
+        max-height:102px;
+    }
+
+    .tank-name{
+        font-size:11px;
+    }
+
+    .stat-value{
+        font-size:9px;
+    }
+
+}
+
 </style>
 </head>
 
+
 <body>
 
+
+<!-- =========================
+     HEADER
+========================= -->
+
 <header>
+
     <div class="header-inner">
+
         <div class="logo">
-            <div class="logo-mark">W</div>
-            <div class="logo-text">WOT<span>DB</span></div>
+
+            <div class="logo-mark">
+                W
+            </div>
+
+            <div class="logo-text">
+                WOT<span>DB</span>
+            </div>
+
         </div>
 
         <div class="header-info">
             World of Tanks Tank Database
         </div>
+
     </div>
+
 </header>
+
+
+
+<!-- =========================
+     MAIN
+========================= -->
 
 <main>
 
+
+    <!-- HERO -->
+
     <section class="hero">
-        <h1>World of Tanks adatbázis</h1>
-        <p>Keresd meg, szűrd és hasonlítsd össze a játék tankjait.</p>
+
+        <h1>
+            World of Tanks adatbázis
+        </h1>
+
+        <p>
+            Keresd meg, szűrd és hasonlítsd össze a játék tankjait.
+        </p>
+
     </section>
+
+
+
+    <!-- FILTERS -->
 
     <section class="filters">
 
         <div class="filter-row">
 
+
             <div class="search">
+
                 <input
                     id="search"
                     type="text"
                     placeholder="Tank keresése..."
                 >
+
             </div>
 
+
             <select id="nation">
-                <option value="">Minden nemzet</option>
+
+                <option value="">
+                    Minden nemzet
+                </option>
+
             </select>
+
 
             <select id="type">
-                <option value="">Minden típus</option>
-                <option value="lightTank">Light</option>
-                <option value="mediumTank">Medium</option>
-                <option value="heavyTank">Heavy</option>
-                <option value="AT-SPG">Tank Destroyer</option>
-                <option value="SPG">SPG</option>
+
+                <option value="">
+                    Minden típus
+                </option>
+
+                <option value="lightTank">
+                    Light
+                </option>
+
+                <option value="mediumTank">
+                    Medium
+                </option>
+
+                <option value="heavyTank">
+                    Heavy
+                </option>
+
+                <option value="AT-SPG">
+                    Tank Destroyer
+                </option>
+
+                <option value="SPG">
+                    SPG
+                </option>
+
             </select>
+
 
             <select id="tier">
-                <option value="">Minden tier</option>
+
+                <option value="">
+                    Minden tier
+                </option>
+
             </select>
+
 
             <select id="premium">
-                <option value="">Minden tank</option>
-                <option value="premium">Prémium</option>
-                <option value="standard">Normál</option>
+
+                <option value="">
+                    Minden tank
+                </option>
+
+                <option value="premium">
+                    Prémium
+                </option>
+
+                <option value="standard">
+                    Normál
+                </option>
+
             </select>
 
+
             <select id="sort">
-                <option value="tier">Tier szerint</option>
-                <option value="name">Név szerint</option>
-                <option value="damage">Sebzés szerint</option>
-                <option value="dpm">DPM szerint</option>
-                <option value="hp">HP szerint</option>
-                <option value="penetration">Penetráció szerint</option>
+
+                <option value="tier">
+                    Tier szerint
+                </option>
+
+                <option value="name">
+                    Név szerint
+                </option>
+
+                <option value="damage">
+                    Sebzés szerint
+                </option>
+
+                <option value="dpm">
+                    DPM szerint
+                </option>
+
+                <option value="hp">
+                    HP szerint
+                </option>
+
+                <option value="penetration">
+                    Penetráció szerint
+                </option>
+
             </select>
+
 
         </div>
 
-        <button class="reset-btn" onclick="resetFilters()">
+
+        <button
+            class="reset-btn"
+            onclick="resetFilters()"
+        >
             Szűrők törlése
         </button>
 
     </section>
 
+
+
+    <!-- RESULT COUNT -->
+
     <div class="results-head">
+
         <div class="results-count">
-            Találatok: <strong id="resultCount">0</strong>
+
+            Találatok:
+            <strong id="resultCount">
+                0
+            </strong>
+
         </div>
+
     </div>
 
-    <section id="tankGrid" class="tank-grid"></section>
 
-    <div id="empty" class="empty" style="display:none;">
+
+    <!-- TANK GRID -->
+
+    <section
+        id="tankGrid"
+        class="tank-grid"
+    ></section>
+
+
+    <!-- EMPTY -->
+
+    <div
+        id="empty"
+        class="empty"
+        style="display:none;"
+    >
         Nincs a keresésnek megfelelő tank.
     </div>
 
+
 </main>
 
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
 <footer>
-    WOTDB – World of Tanks fan project · Nem áll kapcsolatban a Wargaminggel.
+
+    WOTDB – World of Tanks fan project
+    · Nem áll kapcsolatban a Wargaminggel.
+
 </footer>
 
 
-<!-- COMPARE BAR -->
+
+<!-- =========================
+     COMPARE BAR
+========================= -->
 
 <div class="compare-bar">
+
     <div class="compare-inner">
+
 
         <div class="compare-title">
             Összehasonlítás
         </div>
 
-        <div id="compareItems" class="compare-items">
-            <span style="color:#7f8b96;font-size:12px;">
-                Válassz tankokat az összehasonlításhoz
+
+        <div
+            id="compareItems"
+            class="compare-items"
+        >
+
+            <span
+                style="
+                    color:#7f8b96;
+                    font-size:12px;
+                "
+            >
+                Válassz tankokat
             </span>
+
         </div>
 
-        <button class="compare-action" onclick="openCompare()">
+
+        <button
+            class="compare-action"
+            onclick="openCompare()"
+        >
             Összehasonlítás
         </button>
 
+
     </div>
+
 </div>
 
 
-<!-- DETAIL MODAL -->
 
-<div id="detailModal" class="modal" onclick="closeModal(event,'detailModal')">
+<!-- =========================
+     DETAIL MODAL
+========================= -->
+
+<div
+    id="detailModal"
+    class="modal"
+    onclick="closeModal(event,'detailModal')"
+>
 
     <div class="modal-box">
 
+
         <div class="modal-header">
-            <h2 id="detailTitle">Tank</h2>
-            <button class="close" onclick="closeSpecificModal('detailModal')">
+
+            <h2 id="detailTitle">
+                Tank
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeSpecificModal('detailModal')"
+            >
                 ×
             </button>
+
         </div>
 
-        <div id="detailBody" class="modal-body"></div>
+
+        <div
+            id="detailBody"
+            class="modal-body"
+        ></div>
+
 
     </div>
 
 </div>
 
 
-<!-- COMPARE MODAL -->
 
-<div id="compareModal" class="modal" onclick="closeModal(event,'compareModal')">
+<!-- =========================
+     COMPARE MODAL
+========================= -->
+
+<div
+    id="compareModal"
+    class="modal"
+    onclick="closeModal(event,'compareModal')"
+>
 
     <div class="modal-box">
 
-        <div class="modal-header">
-            <h2>Tankok összehasonlítása</h2>
 
-            <button class="close" onclick="closeSpecificModal('compareModal')">
+        <div class="modal-header">
+
+            <h2>
+                Tankok összehasonlítása
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeSpecificModal('compareModal')"
+            >
                 ×
             </button>
+
         </div>
 
-        <div id="compareBody" class="modal-body"></div>
+
+        <div
+            id="compareBody"
+            class="modal-body"
+        ></div>
+
 
     </div>
 
 </div>
+
 
 
 <script>
 
+
+/* =========================
+   VARIABLES
+========================= */
+
 let tanks = [];
+
 let filteredTanks = [];
+
 let compareList = [];
 
 
+
 /* =========================
-   LOAD DATA
+   LOAD TANKS
 ========================= */
 
 async function loadTanks(){
@@ -808,65 +1345,120 @@ async function loadTanks(){
             "tanks.json?cache=" + Date.now()
         );
 
+
         if(!response.ok){
-            throw new Error("A tanks.json nem tölthető be.");
+
+            throw new Error(
+                "A tanks.json nem tölthető be."
+            );
+
         }
+
 
         tanks = await response.json();
 
+
         prepareFilters();
+
         applyFilters();
+
 
     }catch(error){
 
         console.error(error);
 
-        document.getElementById("tankGrid").innerHTML = `
-            <div class="empty" style="display:block;">
-                <strong>Hiba történt.</strong><br><br>
+
+        document.getElementById(
+            "tankGrid"
+        ).innerHTML = `
+
+            <div
+                class="empty"
+                style="display:block;"
+            >
+
+                <strong>
+                    Hiba történt.
+                </strong>
+
+                <br><br>
+
                 A tanks.json fájl nem tölthető be.
+
             </div>
+
         `;
+
     }
+
 }
 
 
+
 /* =========================
-   FILTERS
+   FILTER OPTIONS
 ========================= */
 
 function prepareFilters(){
 
-    const nations = [...new Set(
-        tanks.map(t => t.nation).filter(Boolean)
-    )].sort();
 
-    const nationSelect = document.getElementById("nation");
+    const nations = [
+        ...new Set(
+            tanks
+                .map(t => t.nation)
+                .filter(Boolean)
+        )
+    ].sort();
+
+
+    const nationSelect =
+        document.getElementById("nation");
+
 
     nations.forEach(nation => {
 
-        const option = document.createElement("option");
+        const option =
+            document.createElement("option");
+
 
         option.value = nation;
-        option.textContent = formatNation(nation);
+
+        option.textContent =
+            formatNation(nation);
+
 
         nationSelect.appendChild(option);
 
     });
 
 
-    const tiers = [...new Set(
-        tanks.map(t => t.tier).filter(Boolean)
-    )].sort((a,b) => a-b);
 
-    const tierSelect = document.getElementById("tier");
+    const tiers = [
+        ...new Set(
+            tanks
+                .map(t => t.tier)
+                .filter(Boolean)
+        )
+    ].sort(
+        (a,b) => a-b
+    );
+
+
+    const tierSelect =
+        document.getElementById("tier");
+
 
     tiers.forEach(tier => {
 
-        const option = document.createElement("option");
+        const option =
+            document.createElement("option");
+
 
         option.value = tier;
-        option.textContent = "Tier " + tier;
+
+        option.textContent =
+            "Tier " + tier;
+
 
         tierSelect.appendChild(option);
 
@@ -875,36 +1467,58 @@ function prepareFilters(){
 }
 
 
+
+/* =========================
+   APPLY FILTERS
+========================= */
+
 function applyFilters(){
 
+
     const search =
-        document.getElementById("search").value
+        document.getElementById("search")
+        .value
         .toLowerCase()
         .trim();
 
+
     const nation =
-        document.getElementById("nation").value;
+        document.getElementById("nation")
+        .value;
+
 
     const type =
-        document.getElementById("type").value;
+        document.getElementById("type")
+        .value;
+
 
     const tier =
-        document.getElementById("tier").value;
+        document.getElementById("tier")
+        .value;
+
 
     const premium =
-        document.getElementById("premium").value;
+        document.getElementById("premium")
+        .value;
+
 
     const sort =
-        document.getElementById("sort").value;
+        document.getElementById("sort")
+        .value;
+
 
 
     filteredTanks = tanks.filter(tank => {
 
+
         const name =
-            (tank.name || "").toLowerCase();
+            (tank.name || "")
+            .toLowerCase();
+
 
         const shortName =
-            (tank.shortName || "").toLowerCase();
+            (tank.shortName || "")
+            .toLowerCase();
 
 
         if(
@@ -912,32 +1526,66 @@ function applyFilters(){
             !name.includes(search) &&
             !shortName.includes(search)
         ){
+
             return false;
+
         }
 
-        if(nation && tank.nation !== nation){
+
+        if(
+            nation &&
+            tank.nation !== nation
+        ){
+
             return false;
+
         }
 
-        if(type && tank.type !== type){
+
+        if(
+            type &&
+            tank.type !== type
+        ){
+
             return false;
+
         }
 
-        if(tier && String(tank.tier) !== String(tier)){
+
+        if(
+            tier &&
+            String(tank.tier) !== String(tier)
+        ){
+
             return false;
+
         }
 
-        if(premium === "premium" && !tank.premium){
+
+        if(
+            premium === "premium" &&
+            !tank.premium
+        ){
+
             return false;
+
         }
 
-        if(premium === "standard" && tank.premium){
+
+        if(
+            premium === "standard" &&
+            tank.premium
+        ){
+
             return false;
+
         }
+
 
         return true;
 
     });
+
 
 
     sortTanks(sort);
@@ -947,52 +1595,99 @@ function applyFilters(){
 }
 
 
+
 /* =========================
    SORT
 ========================= */
 
 function sortTanks(sort){
 
+
     filteredTanks.sort((a,b) => {
 
-        const sa = a.stats || {};
-        const sb = b.stats || {};
+
+        const sa =
+            a.stats || {};
+
+
+        const sb =
+            b.stats || {};
+
 
         if(sort === "name"){
-            return (a.name || "").localeCompare(
+
+            return (
+                a.name || ""
+            ).localeCompare(
                 b.name || ""
             );
+
         }
+
 
         if(sort === "damage"){
-            return (sb.gun?.damage || 0)
-                 - (sa.gun?.damage || 0);
+
+            return (
+                sb.gun?.damage || 0
+            ) - (
+                sa.gun?.damage || 0
+            );
+
         }
+
 
         if(sort === "dpm"){
-            return (sb.gun?.dpm || 0)
-                 - (sa.gun?.dpm || 0);
+
+            return (
+                sb.gun?.dpm || 0
+            ) - (
+                sa.gun?.dpm || 0
+            );
+
         }
+
 
         if(sort === "hp"){
-            return (sb.health || 0)
-                 - (sa.health || 0);
+
+            return (
+                sb.health || 0
+            ) - (
+                sa.health || 0
+            );
+
         }
+
 
         if(sort === "penetration"){
-            return (sb.gun?.penetration || 0)
-                 - (sa.gun?.penetration || 0);
+
+            return (
+                sb.gun?.penetration || 0
+            ) - (
+                sa.gun?.penetration || 0
+            );
+
         }
 
+
         return (
-            (b.tier || 0) - (a.tier || 0)
+
+            (b.tier || 0)
+            -
+            (a.tier || 0)
+
         ) || (
-            (a.name || "").localeCompare(b.name || "")
+
+            (a.name || "")
+            .localeCompare(
+                b.name || ""
+            )
+
         );
 
     });
 
 }
+
 
 
 /* =========================
@@ -1001,125 +1696,249 @@ function sortTanks(sort){
 
 function renderTanks(){
 
-    const grid = document.getElementById("tankGrid");
-    const empty = document.getElementById("empty");
 
-    document.getElementById("resultCount").textContent =
+    const grid =
+        document.getElementById(
+            "tankGrid"
+        );
+
+
+    const empty =
+        document.getElementById(
+            "empty"
+        );
+
+
+    document.getElementById(
+        "resultCount"
+    ).textContent =
         filteredTanks.length;
+
 
 
     if(!filteredTanks.length){
 
         grid.innerHTML = "";
-        empty.style.display = "block";
+
+        empty.style.display =
+            "block";
 
         return;
+
     }
 
-    empty.style.display = "none";
+
+    empty.style.display =
+        "none";
 
 
-    grid.innerHTML = filteredTanks.map(tank => {
 
-        const s = tank.stats || {};
-        const gun = s.gun || {};
-
-        return `
-
-        <article class="tank-card">
-
-            <div class="tank-image">
-
-                ${
-                    tank.icon
-                    ? `<img src="${tank.icon}" alt="">`
-                    : `<span style="color:#65717d;">Nincs kép</span>`
-                }
-
-            </div>
-
-            <div class="tank-content">
-
-                <div class="tank-name">
-                    ${escapeHtml(tank.name || "Ismeretlen")}
-                </div>
-
-                <div class="tank-meta">
-
-                    <span class="badge tier">
-                        Tier ${tank.tier || "-"}
-                    </span>
-
-                    <span class="badge">
-                        ${formatType(tank.type)}
-                    </span>
-
-                    ${
-                        tank.premium
-                        ? `<span class="badge premium">PRÉMIUM</span>`
-                        : ""
-                    }
-
-                </div>
+    grid.innerHTML =
+        filteredTanks
+        .map(tank => {
 
 
-                <div class="stats">
-
-                    <div class="stat">
-                        <div class="stat-label">HP</div>
-                        <div class="stat-value">
-                            ${s.health || "-"}
-                        </div>
-                    </div>
-
-                    <div class="stat">
-                        <div class="stat-label">Sebzés</div>
-                        <div class="stat-value">
-                            ${gun.damage || "-"}
-                        </div>
-                    </div>
-
-                    <div class="stat">
-                        <div class="stat-label">DPM</div>
-                        <div class="stat-value">
-                            ${gun.dpm || "-"}
-                        </div>
-                    </div>
-
-                </div>
+            const s =
+                tank.stats || {};
 
 
-                <div class="card-buttons">
+            const gun =
+                s.gun || {};
 
-                    <button
-                        class="btn primary"
-                        onclick="openDetails(${tank.id})"
-                    >
-                        Részletek
-                    </button>
 
-                    <button
-                        class="btn"
-                        onclick="toggleCompare(${tank.id})"
-                    >
+
+            return `
+
+                <article class="tank-card">
+
+
+                    <div class="tank-image">
+
                         ${
-                            compareList.includes(tank.id)
-                            ? "✓ Kiválasztva"
-                            : "Összehasonlítás"
+                            tank.icon
+
+                            ?
+
+                            `
+                            <img
+                                src="${tank.icon}"
+                                alt="${escapeHtml(tank.name || "")}"
+                                loading="lazy"
+                            >
+                            `
+
+                            :
+
+                            `
+                            <span
+                                style="
+                                    color:#65717d;
+                                "
+                            >
+                                Nincs kép
+                            </span>
+                            `
                         }
-                    </button>
 
-                </div>
+                    </div>
 
-            </div>
 
-        </article>
 
-        `;
+                    <div class="tank-content">
 
-    }).join("");
+
+                        <div class="tank-name">
+
+                            ${escapeHtml(
+                                tank.name ||
+                                "Ismeretlen"
+                            )}
+
+                        </div>
+
+
+
+                        <div class="tank-meta">
+
+
+                            <span class="badge tier">
+
+                                Tier
+                                ${tank.tier || "-"}
+
+                            </span>
+
+
+                            <span class="badge">
+
+                                ${formatType(
+                                    tank.type
+                                )}
+
+                            </span>
+
+
+                            ${
+                                tank.premium
+
+                                ?
+
+                                `
+                                <span class="badge premium">
+                                    PRÉMIUM
+                                </span>
+                                `
+
+                                :
+
+                                ""
+                            }
+
+
+                        </div>
+
+
+
+                        <div class="stats">
+
+
+                            <div class="stat">
+
+                                <div class="stat-label">
+                                    HP
+                                </div>
+
+                                <div class="stat-value">
+                                    ${formatNumber(
+                                        s.health
+                                    )}
+                                </div>
+
+                            </div>
+
+
+
+                            <div class="stat">
+
+                                <div class="stat-label">
+                                    Sebzés
+                                </div>
+
+                                <div class="stat-value">
+                                    ${formatNumber(
+                                        gun.damage
+                                    )}
+                                </div>
+
+                            </div>
+
+
+
+                            <div class="stat">
+
+                                <div class="stat-label">
+                                    DPM
+                                </div>
+
+                                <div class="stat-value">
+                                    ${formatNumber(
+                                        gun.dpm
+                                    )}
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <div class="card-buttons">
+
+
+                            <button
+                                class="btn primary"
+                                onclick="openDetails(${tank.id})"
+                            >
+                                Részletek
+                            </button>
+
+
+                            <button
+                                class="btn"
+                                onclick="toggleCompare(${tank.id})"
+                            >
+
+                                ${
+                                    compareList.includes(tank.id)
+
+                                    ?
+
+                                    "✓ Kiválasztva"
+
+                                    :
+
+                                    "Összehasonlítás"
+                                }
+
+                            </button>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </article>
+
+            `;
+
+        })
+        .join("");
 
 }
+
 
 
 /* =========================
@@ -1128,235 +1947,539 @@ function renderTanks(){
 
 function openDetails(id){
 
-    const tank = tanks.find(t => t.id === id);
+
+    const tank =
+        tanks.find(
+            t => t.id === id
+        );
+
 
     if(!tank) return;
 
-    const s = tank.stats || {};
-    const gun = s.gun || {};
-    const armor = s.armor || {};
-    const engine = s.engine || {};
-    const turret = s.turret || {};
-    const mobility = s.mobility || {};
-    const radio = s.radio || {};
 
 
-    document.getElementById("detailTitle").textContent =
+    const s =
+        tank.stats || {};
+
+
+    const gun =
+        s.gun || {};
+
+
+    const armor =
+        s.armor || {};
+
+
+    const engine =
+        s.engine || {};
+
+
+    const turret =
+        s.turret || {};
+
+
+    const mobility =
+        s.mobility || {};
+
+
+    const radio =
+        s.radio || {};
+
+
+
+    document.getElementById(
+        "detailTitle"
+    ).textContent =
         tank.name || "Tank";
 
 
-    document.getElementById("detailBody").innerHTML = `
+
+    document.getElementById(
+        "detailBody"
+    ).innerHTML = `
+
 
         <div class="detail-top">
+
 
             <div class="detail-image">
 
                 ${
                     tank.icon
-                    ? `<img src="${tank.icon}" alt="">`
-                    : ""
+
+                    ?
+
+                    `
+                    <img
+                        src="${tank.icon}"
+                        alt=""
+                    >
+                    `
+
+                    :
+
+                    ""
                 }
 
             </div>
 
+
+
             <div>
+
 
                 <div class="tank-meta">
 
+
                     <span class="badge tier">
-                        Tier ${tank.tier || "-"}
+
+                        Tier
+                        ${tank.tier || "-"}
+
                     </span>
 
-                    <span class="badge">
-                        ${formatNation(tank.nation)}
-                    </span>
 
                     <span class="badge">
-                        ${formatType(tank.type)}
+
+                        ${formatNation(
+                            tank.nation
+                        )}
+
                     </span>
+
+
+                    <span class="badge">
+
+                        ${formatType(
+                            tank.type
+                        )}
+
+                    </span>
+
 
                     ${
                         tank.premium
-                        ? `<span class="badge premium">PRÉMIUM</span>`
-                        : ""
+
+                        ?
+
+                        `
+                        <span class="badge premium">
+                            PRÉMIUM
+                        </span>
+                        `
+
+                        :
+
+                        ""
                     }
+
 
                 </div>
 
+
+
                 <p class="detail-description">
-                    ${escapeHtml(tank.description || "Nincs leírás.")}
+
+                    ${escapeHtml(
+                        tank.description ||
+                        "Nincs leírás."
+                    )}
+
                 </p>
 
+
             </div>
+
 
         </div>
 
 
+
         <div class="detail-section">
 
-            <h3>Alapadatok</h3>
+
+            <h3>
+                Alapadatok
+            </h3>
+
 
             <div class="detail-grid">
 
-                ${detailStat("HP", s.health)}
-                ${detailStat("Tömeg", formatNumber(s.weight) + " kg")}
-                ${detailStat("Max. lőszer", s.maxAmmo)}
-                ${detailStat("Előremenet", mobility.speedForward + " km/h")}
-                ${detailStat("Hátramenet", mobility.speedBackward + " km/h")}
-                ${detailStat("Rádió", radio.signalRange + " m")}
+
+                ${detailStat(
+                    "HP",
+                    s.health
+                )}
+
+
+                ${detailStat(
+                    "Test HP",
+                    s.hullHealth
+                )}
+
+
+                ${detailStat(
+                    "Tömeg",
+                    formatNumber(s.weight) + " kg"
+                )}
+
+
+                ${detailStat(
+                    "Max. lőszer",
+                    s.maxAmmo
+                )}
+
+
+                ${detailStat(
+                    "Előremenet",
+                    mobility.speedForward + " km/h"
+                )}
+
+
+                ${detailStat(
+                    "Hátramenet",
+                    mobility.speedBackward + " km/h"
+                )}
+
+
+                ${detailStat(
+                    "Rádió",
+                    radio.signalRange + " m"
+                )}
+
 
             </div>
+
 
         </div>
 
 
+
         <div class="detail-section">
 
-            <h3>Löveg</h3>
+
+            <h3>
+                Löveg
+            </h3>
+
 
             <div class="detail-grid">
 
-                ${detailStat("Löveg", gun.name)}
-                ${detailStat("Sebzés", gun.damage)}
-                ${detailStat("Penetráció", gun.penetration)}
-                ${detailStat("DPM", gun.dpm)}
-                ${detailStat("Újratöltés", gun.reload + " s")}
-                ${detailStat("Célzás", gun.aimTime + " s")}
-                ${detailStat("Szórás", gun.dispersion)}
-                ${detailStat("Kaliber", gun.caliber + " mm")}
-                ${detailStat("Forgási sebesség", gun.traverseSpeed + " °/s")}
-                ${detailStat("Csőlehajlás", gun.depression + "°")}
-                ${detailStat("Csőemelés", gun.elevation + "°")}
+
+                ${detailStat(
+                    "Löveg",
+                    gun.name
+                )}
+
+
+                ${detailStat(
+                    "Sebzés",
+                    gun.damage
+                )}
+
+
+                ${detailStat(
+                    "Penetráció",
+                    gun.penetration
+                )}
+
+
+                ${detailStat(
+                    "DPM",
+                    gun.dpm
+                )}
+
+
+                ${detailStat(
+                    "Újratöltés",
+                    gun.reload + " s"
+                )}
+
+
+                ${detailStat(
+                    "Célzás",
+                    gun.aimTime + " s"
+                )}
+
+
+                ${detailStat(
+                    "Szórás",
+                    gun.dispersion
+                )}
+
+
+                ${detailStat(
+                    "Kaliber",
+                    gun.caliber + " mm"
+                )}
+
+
+                ${detailStat(
+                    "Forgási sebesség",
+                    gun.traverseSpeed + " °/s"
+                )}
+
+
+                ${detailStat(
+                    "Csőlehajlás",
+                    gun.depression + "°"
+                )}
+
+
+                ${detailStat(
+                    "Csőemelés",
+                    gun.elevation + "°"
+                )}
+
 
             </div>
+
 
         </div>
 
 
+
         <div class="detail-section">
 
-            <h3>Páncélzat</h3>
+
+            <h3>
+                Páncélzat
+            </h3>
+
 
             <div class="detail-grid">
 
-                ${detailStat("Test front", armor.hull?.front + " mm")}
-                ${detailStat("Test oldal", armor.hull?.side + " mm")}
-                ${detailStat("Test hátul", armor.hull?.rear + " mm")}
-                ${detailStat("Torony front", armor.turret?.front + " mm")}
-                ${detailStat("Torony oldal", armor.turret?.side + " mm")}
-                ${detailStat("Torony hátul", armor.turret?.rear + " mm")}
+
+                ${detailStat(
+                    "Test front",
+                    armor.hull?.front + " mm"
+                )}
+
+
+                ${detailStat(
+                    "Test oldal",
+                    armor.hull?.side + " mm"
+                )}
+
+
+                ${detailStat(
+                    "Test hátul",
+                    armor.hull?.rear + " mm"
+                )}
+
+
+                ${detailStat(
+                    "Torony front",
+                    armor.turret?.front + " mm"
+                )}
+
+
+                ${detailStat(
+                    "Torony oldal",
+                    armor.turret?.side + " mm"
+                )}
+
+
+                ${detailStat(
+                    "Torony hátul",
+                    armor.turret?.rear + " mm"
+                )}
+
 
             </div>
+
 
         </div>
 
 
+
         <div class="detail-section">
 
-            <h3>Motor</h3>
+
+            <h3>
+                Motor
+            </h3>
+
 
             <div class="detail-grid">
 
-                ${detailStat("Motor", engine.name)}
-                ${detailStat("Teljesítmény", engine.power + " LE")}
-                ${detailStat("Tűzveszély", ((engine.fireChance || 0) * 100) + "%")}
+
+                ${detailStat(
+                    "Motor",
+                    engine.name
+                )}
+
+
+                ${detailStat(
+                    "Teljesítmény",
+                    engine.power + " LE"
+                )}
+
+
+                ${detailStat(
+                    "Tűzveszély",
+                    ((engine.fireChance || 0) * 100) + "%"
+                )}
+
 
             </div>
+
 
         </div>
 
     `;
 
 
-    document.getElementById("detailModal")
-        .classList.add("active");
+
+    document.getElementById(
+        "detailModal"
+    ).classList.add(
+        "active"
+    );
 
 }
 
 
+
+/* =========================
+   DETAIL STAT
+========================= */
+
 function detailStat(label,value){
+
 
     if(
         value === undefined ||
         value === null ||
         value === "undefined"
     ){
+
         value = "-";
+
     }
+
 
     return `
 
         <div class="detail-stat">
 
-            <small>${label}</small>
+            <small>
+                ${escapeHtml(label)}
+            </small>
 
             <strong>
-                ${escapeHtml(String(value))}
+                ${escapeHtml(
+                    String(value)
+                )}
             </strong>
 
         </div>
 
     `;
+
 }
 
 
+
 /* =========================
-   COMPARISON
+   COMPARE
 ========================= */
 
 function toggleCompare(id){
 
-    if(compareList.includes(id)){
+
+    if(
+        compareList.includes(id)
+    ){
 
         compareList =
-            compareList.filter(x => x !== id);
+            compareList.filter(
+                x => x !== id
+            );
 
     }else{
 
-        if(compareList.length >= 4){
 
-            alert("Legfeljebb 4 tankot hasonlíthatsz össze.");
+        if(
+            compareList.length >= 4
+        ){
+
+            alert(
+                "Legfeljebb 4 tankot hasonlíthatsz össze."
+            );
 
             return;
+
         }
 
+
         compareList.push(id);
+
     }
 
+
     updateCompareBar();
+
     renderTanks();
+
 }
 
 
+
+/* =========================
+   COMPARE BAR
+========================= */
+
 function updateCompareBar(){
 
+
     const container =
-        document.getElementById("compareItems");
+        document.getElementById(
+            "compareItems"
+        );
 
 
     if(!compareList.length){
 
         container.innerHTML = `
-            <span style="color:#7f8b96;font-size:12px;">
-                Válassz tankokat az összehasonlításhoz
+
+            <span
+                style="
+                    color:#7f8b96;
+                    font-size:12px;
+                "
+            >
+                Válassz tankokat
             </span>
+
         `;
 
         return;
+
     }
 
 
+
     container.innerHTML =
-        compareList.map(id => {
+        compareList
+        .map(id => {
+
 
             const tank =
-                tanks.find(t => t.id === id);
+                tanks.find(
+                    t => t.id === id
+                );
+
 
             return `
 
                 <div class="compare-item">
 
-                    ${escapeHtml(tank?.name || "Tank")}
+                    ${escapeHtml(
+                        tank?.name ||
+                        "Tank"
+                    )}
+
 
                     <span
                         class="remove-compare"
@@ -1369,77 +2492,190 @@ function updateCompareBar(){
 
             `;
 
-        }).join("");
+        })
+        .join("");
 
 }
 
 
+
+/* =========================
+   OPEN COMPARE
+========================= */
+
 function openCompare(){
 
-    if(compareList.length < 2){
 
-        alert("Legalább 2 tank szükséges az összehasonlításhoz.");
+    if(
+        compareList.length < 2
+    ){
+
+        alert(
+            "Legalább 2 tank szükséges az összehasonlításhoz."
+        );
 
         return;
+
     }
+
 
 
     const selected =
         compareList
-            .map(id => tanks.find(t => t.id === id))
-            .filter(Boolean);
+        .map(
+            id =>
+                tanks.find(
+                    t => t.id === id
+                )
+        )
+        .filter(Boolean);
+
 
 
     const rows = [
 
+
         {
+
             section:"Alapadatok",
+
             values:[
-                ["Tier", t => t.tier],
-                ["HP", t => t.stats?.health],
-                ["Tömeg", t => t.stats?.weight],
-            ],
-            higher:true
+
+                [
+                    "Tier",
+                    t => t.tier
+                ],
+
+                [
+                    "HP",
+                    t => t.stats?.health
+                ],
+
+                [
+                    "Tömeg",
+                    t => t.stats?.weight
+                ]
+
+            ]
+
         },
 
+
         {
+
             section:"Löveg",
+
             values:[
-                ["Sebzés", t => t.stats?.gun?.damage],
-                ["Penetráció", t => t.stats?.gun?.penetration],
-                ["DPM", t => t.stats?.gun?.dpm],
-                ["Újratöltés", t => t.stats?.gun?.reload],
-                ["Célzás", t => t.stats?.gun?.aimTime],
-                ["Szórás", t => t.stats?.gun?.dispersion],
-                ["Csőlehajlás", t => t.stats?.gun?.depression],
-            ],
-            higher:true
+
+                [
+                    "Sebzés",
+                    t => t.stats?.gun?.damage
+                ],
+
+                [
+                    "Penetráció",
+                    t => t.stats?.gun?.penetration
+                ],
+
+                [
+                    "DPM",
+                    t => t.stats?.gun?.dpm
+                ],
+
+                [
+                    "Újratöltés",
+                    t => t.stats?.gun?.reload
+                ],
+
+                [
+                    "Célzás",
+                    t => t.stats?.gun?.aimTime
+                ],
+
+                [
+                    "Szórás",
+                    t => t.stats?.gun?.dispersion
+                ],
+
+                [
+                    "Csőlehajlás",
+                    t => t.stats?.gun?.depression
+                ]
+
+            ]
+
         },
 
+
         {
+
             section:"Mobilitás",
+
             values:[
-                ["Előremeneti sebesség", t => t.stats?.mobility?.speedForward],
-                ["Hátrameneti sebesség", t => t.stats?.mobility?.speedBackward],
-                ["Motor", t => t.stats?.engine?.power],
-            ],
-            higher:true
+
+                [
+                    "Előremeneti sebesség",
+                    t => t.stats?.mobility?.speedForward
+                ],
+
+                [
+                    "Hátrameneti sebesség",
+                    t => t.stats?.mobility?.speedBackward
+                ],
+
+                [
+                    "Motor",
+                    t => t.stats?.engine?.power
+                ]
+
+            ]
+
         },
 
+
         {
+
             section:"Páncélzat",
+
             values:[
-                ["Test front", t => t.stats?.armor?.hull?.front],
-                ["Test oldal", t => t.stats?.armor?.hull?.side],
-                ["Test hátul", t => t.stats?.armor?.hull?.rear],
-                ["Torony front", t => t.stats?.armor?.turret?.front],
-                ["Torony oldal", t => t.stats?.armor?.turret?.side],
-                ["Torony hátul", t => t.stats?.armor?.turret?.rear],
-            ],
-            higher:true
+
+                [
+                    "Test front",
+                    t => t.stats?.armor?.hull?.front
+                ],
+
+                [
+                    "Test oldal",
+                    t => t.stats?.armor?.hull?.side
+                ],
+
+                [
+                    "Test hátul",
+                    t => t.stats?.armor?.hull?.rear
+                ],
+
+                [
+                    "Torony front",
+                    t => t.stats?.armor?.turret?.front
+                ],
+
+                [
+                    "Torony oldal",
+                    t => t.stats?.armor?.turret?.side
+                ],
+
+                [
+                    "Torony hátul",
+                    t => t.stats?.armor?.turret?.rear
+                ]
+
+            ]
+
         }
 
+
     ];
+
 
 
     let html = `
@@ -1448,35 +2684,53 @@ function openCompare(){
 
             <table class="compare-table">
 
+
                 <thead>
 
                     <tr>
 
-                        <th>Stat</th>
+                        <th>
+                            Stat
+                        </th>
 
-                        ${selected.map(t => `
-                            <th>
-                                ${escapeHtml(t.name)}
-                            </th>
-                        `).join("")}
+                        ${
+                            selected
+                            .map(t => `
+
+                                <th>
+                                    ${escapeHtml(
+                                        t.name
+                                    )}
+                                </th>
+
+                            `)
+                            .join("")
+                        }
 
                     </tr>
 
                 </thead>
+
 
                 <tbody>
 
     `;
 
 
+
     rows.forEach(group => {
+
 
         html += `
 
             <tr class="section-row">
 
-                <td colspan="${selected.length + 1}">
+                <td
+                    colspan="${selected.length + 1}"
+                >
+
                     ${group.section}
+
                 </td>
 
             </tr>
@@ -1484,71 +2738,134 @@ function openCompare(){
         `;
 
 
+
         group.values.forEach(row => {
+
 
             const values =
                 selected.map(t => {
 
+
                     const value =
                         row[1](t);
 
-                    return Number.isFinite(Number(value))
-                        ? Number(value)
-                        : null;
+
+                    return Number.isFinite(
+                        Number(value)
+                    )
+
+                    ?
+
+                    Number(value)
+
+                    :
+
+                    null;
 
                 });
 
 
+
             const valid =
-                values.filter(v => v !== null);
+                values.filter(
+                    v => v !== null
+                );
+
 
 
             let best = null;
+
             let worst = null;
 
 
-            if(valid.length > 1){
 
-                best = Math.max(...valid);
-                worst = Math.min(...valid);
+            if(
+                valid.length > 1
+            ){
+
+                best =
+                    Math.max(...valid);
+
+                worst =
+                    Math.min(...valid);
 
             }
+
 
 
             html += `
 
                 <tr>
 
-                    <td>${row[0]}</td>
+                    <td>
+                        ${escapeHtml(row[0])}
+                    </td>
+
 
                     ${
-                        values.map(value => {
+                        values
+                        .map(value => {
 
-                            if(value === null){
 
-                                return `<td>-</td>`;
+                            if(
+                                value === null
+                            ){
+
+                                return `
+                                    <td>
+                                        -
+                                    </td>
+                                `;
 
                             }
+
+
 
                             let cls = "";
 
-                            if(valid.length > 1){
 
-                                if(value === best)
+
+                            if(
+                                valid.length > 1
+                            ){
+
+                                if(
+                                    value === best
+                                ){
+
                                     cls = "best";
 
-                                if(value === worst)
+                                }
+
+
+                                if(
+                                    value === worst
+                                ){
+
                                     cls = "worst";
+
+                                }
 
                             }
 
+
+
                             return `
-                                <td class="${cls}">
-                                    ${formatNumber(value)}
+
+                                <td
+                                    class="${cls}"
+                                >
+
+                                    ${formatNumber(
+                                        value
+                                    )}
+
                                 </td>
+
                             `;
 
-                        }).join("")
+                        })
+                        .join("")
                     }
 
                 </tr>
@@ -1560,6 +2877,7 @@ function openCompare(){
     });
 
 
+
     html += `
 
                 </tbody>
@@ -1568,33 +2886,52 @@ function openCompare(){
 
         </div>
 
-        <p style="
-            color:#75818d;
-            font-size:12px;
-            margin-top:15px;
-        ">
-            Zöld = legjobb érték · Piros = legrosszabb érték
+
+        <p
+            style="
+                color:#75818d;
+                font-size:12px;
+                margin-top:15px;
+            "
+        >
+
+            Zöld = legjobb érték
+            ·
+            Piros = legrosszabb érték
+
         </p>
 
     `;
 
 
-    document.getElementById("compareBody").innerHTML =
+
+    document.getElementById(
+        "compareBody"
+    ).innerHTML =
         html;
 
-    document.getElementById("compareModal")
-        .classList.add("active");
+
+
+    document.getElementById(
+        "compareModal"
+    ).classList.add(
+        "active"
+    );
 
 }
 
 
+
 /* =========================
-   MODAL
+   MODALS
 ========================= */
 
 function closeModal(event,id){
 
-    if(event.target.id === id){
+
+    if(
+        event.target.id === id
+    ){
 
         closeSpecificModal(id);
 
@@ -1603,150 +2940,336 @@ function closeModal(event,id){
 }
 
 
+
 function closeSpecificModal(id){
 
-    document.getElementById(id)
-        .classList.remove("active");
+
+    document.getElementById(
+        id
+    ).classList.remove(
+        "active"
+    );
 
 }
 
 
-document.addEventListener("keydown", event => {
 
-    if(event.key === "Escape"){
+document.addEventListener(
+    "keydown",
+    event => {
 
-        document.querySelectorAll(".modal")
-            .forEach(modal =>
-                modal.classList.remove("active")
-            );
+
+        if(
+            event.key === "Escape"
+        ){
+
+            document
+                .querySelectorAll(".modal")
+                .forEach(
+                    modal =>
+                        modal.classList.remove(
+                            "active"
+                        )
+                );
+
+        }
 
     }
+);
 
-});
 
 
 /* =========================
-   RESET
+   RESET FILTERS
 ========================= */
 
 function resetFilters(){
 
-    document.getElementById("search").value = "";
-    document.getElementById("nation").value = "";
-    document.getElementById("type").value = "";
-    document.getElementById("tier").value = "";
-    document.getElementById("premium").value = "";
-    document.getElementById("sort").value = "tier";
+
+    document.getElementById(
+        "search"
+    ).value = "";
+
+
+    document.getElementById(
+        "nation"
+    ).value = "";
+
+
+    document.getElementById(
+        "type"
+    ).value = "";
+
+
+    document.getElementById(
+        "tier"
+    ).value = "";
+
+
+    document.getElementById(
+        "premium"
+    ).value = "";
+
+
+    document.getElementById(
+        "sort"
+    ).value = "tier";
+
 
     applyFilters();
 
 }
 
 
+
 /* =========================
-   HELPERS
+   FORMAT NATION
 ========================= */
 
 function formatNation(nation){
 
+
     const names = {
 
-        ussr:"Szovjetunió",
-        germany:"Németország",
-        usa:"USA",
-        uk:"Egyesült Királyság",
-        france:"Franciaország",
-        czech:"Csehszlovákia",
-        japan:"Japán",
-        china:"Kína",
-        sweden:"Svédország",
-        poland:"Lengyelország",
-        italy:"Olaszország",
-        common_test:"Common Test"
+
+        ussr:
+            "Szovjetunió",
+
+
+        germany:
+            "Németország",
+
+
+        usa:
+            "USA",
+
+
+        uk:
+            "Egyesült Királyság",
+
+
+        france:
+            "Franciaország",
+
+
+        czech:
+            "Csehszlovákia",
+
+
+        japan:
+            "Japán",
+
+
+        china:
+            "Kína",
+
+
+        sweden:
+            "Svédország",
+
+
+        poland:
+            "Lengyelország",
+
+
+        italy:
+            "Olaszország",
+
+
+        common_test:
+            "Common Test"
 
     };
 
-    return names[nation] || nation || "-";
+
+    return (
+        names[nation] ||
+        nation ||
+        "-"
+    );
 
 }
 
+
+
+/* =========================
+   FORMAT TYPE
+========================= */
 
 function formatType(type){
 
+
     const names = {
 
-        lightTank:"Light",
-        mediumTank:"Medium",
-        heavyTank:"Heavy",
-        "AT-SPG":"Tank Destroyer",
-        SPG:"SPG"
+
+        lightTank:
+            "Light",
+
+
+        mediumTank:
+            "Medium",
+
+
+        heavyTank:
+            "Heavy",
+
+
+        "AT-SPG":
+            "Tank Destroyer",
+
+
+        SPG:
+            "SPG"
 
     };
 
-    return names[type] || type || "-";
+
+    return (
+        names[type] ||
+        type ||
+        "-"
+    );
 
 }
 
 
+
+/* =========================
+   FORMAT NUMBER
+========================= */
+
 function formatNumber(value){
+
 
     if(
         value === undefined ||
         value === null ||
         value === ""
     ){
+
         return "-";
+
     }
 
-    const number = Number(value);
 
-    if(Number.isNaN(number)){
+    const number =
+        Number(value);
+
+
+    if(
+        Number.isNaN(number)
+    ){
+
         return String(value);
+
     }
 
-    return number.toLocaleString("hu-HU",{
-        maximumFractionDigits:2
-    });
+
+    return number.toLocaleString(
+        "hu-HU",
+        {
+            maximumFractionDigits:2
+        }
+    );
 
 }
 
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
 
 function escapeHtml(value){
 
+
     return String(value)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
+
 
 
 /* =========================
    EVENTS
 ========================= */
 
-document.getElementById("search")
-    .addEventListener("input",applyFilters);
-
-document.getElementById("nation")
-    .addEventListener("change",applyFilters);
-
-document.getElementById("type")
-    .addEventListener("change",applyFilters);
-
-document.getElementById("tier")
-    .addEventListener("change",applyFilters);
-
-document.getElementById("premium")
-    .addEventListener("change",applyFilters);
-
-document.getElementById("sort")
-    .addEventListener("change",applyFilters);
+document
+    .getElementById("search")
+    .addEventListener(
+        "input",
+        applyFilters
+    );
 
 
-/* START */
+document
+    .getElementById("nation")
+    .addEventListener(
+        "change",
+        applyFilters
+    );
+
+
+document
+    .getElementById("type")
+    .addEventListener(
+        "change",
+        applyFilters
+    );
+
+
+document
+    .getElementById("tier")
+    .addEventListener(
+        "change",
+        applyFilters
+    );
+
+
+document
+    .getElementById("premium")
+    .addEventListener(
+        "change",
+        applyFilters
+    );
+
+
+document
+    .getElementById("sort")
+    .addEventListener(
+        "change",
+        applyFilters
+    );
+
+
+
+/* =========================
+   START
+========================= */
 
 loadTanks();
 
