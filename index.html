@@ -68,6 +68,7 @@ header{
     display:flex;
     align-items:center;
     justify-content:space-between;
+    gap:20px;
 }
 
 .logo{
@@ -99,9 +100,30 @@ header{
     color:var(--accent);
 }
 
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
 .header-info{
     color:var(--muted);
     font-size:13px;
+}
+
+.language-select{
+    height:38px;
+    min-width:125px;
+    border:1px solid var(--border);
+    background:#11171e;
+    color:white;
+    border-radius:7px;
+    padding:0 10px;
+    outline:none;
+}
+
+.language-select:focus{
+    border-color:var(--accent);
 }
 
 
@@ -636,12 +658,27 @@ footer{
 @media(max-width:750px){
 
     header{
-        height:60px;
-        padding:0 14px;
+        height:auto;
+        min-height:60px;
+        padding:10px 14px;
     }
 
     .header-info{
         display:none;
+    }
+
+    .header-inner{
+        flex-wrap:wrap;
+    }
+
+    .header-right{
+        margin-left:auto;
+    }
+
+    .language-select{
+        min-width:110px;
+        height:36px;
+        font-size:12px;
     }
 
     .logo-mark{
@@ -921,9 +958,8 @@ footer{
         padding:6px 3px;
     }
 
-    .detail-grid{
-        grid-template-columns:1fr 1fr;
-        gap:6px;
+    .language-select{
+        min-width:100px;
     }
 
 }
@@ -968,6 +1004,7 @@ footer{
 
     <div class="header-inner">
 
+
         <div class="logo">
 
             <div class="logo-mark">
@@ -980,9 +1017,53 @@ footer{
 
         </div>
 
-        <div class="header-info">
-            World of Tanks Tank Database
+
+
+        <div class="header-right">
+
+            <div class="header-info">
+                World of Tanks Tank Database
+            </div>
+
+
+            <select
+                id="languageSelect"
+                class="language-select"
+                onchange="changeLanguage(this.value)"
+            >
+
+                <option value="hu">
+                    🇭🇺 Magyar
+                </option>
+
+                <option value="en">
+                    🇬🇧 English
+                </option>
+
+                <option value="de">
+                    🇩🇪 Deutsch
+                </option>
+
+                <option value="fr">
+                    🇫🇷 Français
+                </option>
+
+                <option value="pl">
+                    🇵🇱 Polski
+                </option>
+
+                <option value="cs">
+                    🇨🇿 Čeština
+                </option>
+
+                <option value="ru">
+                    🇷🇺 Русский
+                </option>
+
+            </select>
+
         </div>
+
 
     </div>
 
@@ -997,15 +1078,13 @@ footer{
 <main>
 
 
-    <!-- HERO -->
-
     <section class="hero">
 
-        <h1>
+        <h1 id="heroTitle">
             World of Tanks adatbázis
         </h1>
 
-        <p>
+        <p id="heroText">
             Keresd meg, szűrd és hasonlítsd össze a játék tankjait.
         </p>
 
@@ -1032,11 +1111,7 @@ footer{
 
 
             <select id="nation">
-
-                <option value="">
-                    Minden nemzet
-                </option>
-
+                <option value="">Minden nemzet</option>
             </select>
 
 
@@ -1130,6 +1205,7 @@ footer{
         <button
             class="reset-btn"
             onclick="resetFilters()"
+            id="resetButton"
         >
             Szűrők törlése
         </button>
@@ -1138,13 +1214,16 @@ footer{
 
 
 
-    <!-- RESULT COUNT -->
+    <!-- RESULTS -->
 
     <div class="results-head">
 
         <div class="results-count">
 
-            Találatok:
+            <span id="resultsLabel">
+                Találatok:
+            </span>
+
             <strong id="resultCount">
                 0
             </strong>
@@ -1155,15 +1234,12 @@ footer{
 
 
 
-    <!-- TANK GRID -->
-
     <section
         id="tankGrid"
         class="tank-grid"
     ></section>
 
 
-    <!-- EMPTY -->
 
     <div
         id="empty"
@@ -1178,11 +1254,7 @@ footer{
 
 
 
-<!-- =========================
-     FOOTER
-========================= -->
-
-<footer>
+<footer id="footerText">
 
     WOTDB – World of Tanks fan project
     · Nem áll kapcsolatban a Wargaminggel.
@@ -1200,7 +1272,10 @@ footer{
     <div class="compare-inner">
 
 
-        <div class="compare-title">
+        <div
+            class="compare-title"
+            id="compareTitle"
+        >
             Összehasonlítás
         </div>
 
@@ -1211,6 +1286,7 @@ footer{
         >
 
             <span
+                id="compareEmpty"
                 style="
                     color:#7f8b96;
                     font-size:12px;
@@ -1225,6 +1301,7 @@ footer{
         <button
             class="compare-action"
             onclick="openCompare()"
+            id="compareButton"
         >
             Összehasonlítás
         </button>
@@ -1292,7 +1369,7 @@ footer{
 
         <div class="modal-header">
 
-            <h2>
+            <h2 id="compareModalTitle">
                 Tankok összehasonlítása
             </h2>
 
@@ -1322,7 +1399,1345 @@ footer{
 
 
 /* =========================
-   VARIABLES
+   LANGUAGES
+========================= */
+
+const translations = {
+
+    hu: {
+
+        heroTitle:
+            "World of Tanks adatbázis",
+
+        heroText:
+            "Keresd meg, szűrd és hasonlítsd össze a játék tankjait.",
+
+        search:
+            "Tank keresése...",
+
+        allNations:
+            "Minden nemzet",
+
+        allTypes:
+            "Minden típus",
+
+        allTiers:
+            "Minden tier",
+
+        allTanks:
+            "Minden tank",
+
+        premium:
+            "Prémium",
+
+        standard:
+            "Normál",
+
+        sortTier:
+            "Tier szerint",
+
+        sortName:
+            "Név szerint",
+
+        sortDamage:
+            "Sebzés szerint",
+
+        sortDpm:
+            "DPM szerint",
+
+        sortHp:
+            "HP szerint",
+
+        sortPen:
+            "Penetráció szerint",
+
+        reset:
+            "Szűrők törlése",
+
+        results:
+            "Találatok:",
+
+        noResults:
+            "Nincs a keresésnek megfelelő tank.",
+
+        details:
+            "Részletek",
+
+        compare:
+            "Összehasonlítás",
+
+        selected:
+            "✓ Kiválasztva",
+
+        chooseTanks:
+            "Válassz tankokat",
+
+        compareNeed:
+            "Legalább 2 tank szükséges az összehasonlításhoz.",
+
+        compareMax:
+            "Legfeljebb 4 tankot hasonlíthatsz össze.",
+
+        basic:
+            "Alapadatok",
+
+        gun:
+            "Löveg",
+
+        mobility:
+            "Mobilitás",
+
+        armor:
+            "Páncélzat",
+
+        engine:
+            "Motor",
+
+        hp:
+            "HP",
+
+        hullHp:
+            "Test HP",
+
+        weight:
+            "Tömeg",
+
+        maxAmmo:
+            "Max. lőszer",
+
+        forward:
+            "Előremenet",
+
+        backward:
+            "Hátramenet",
+
+        radio:
+            "Rádió",
+
+        gunName:
+            "Löveg",
+
+        damage:
+            "Sebzés",
+
+        penetration:
+            "Penetráció",
+
+        dpm:
+            "DPM",
+
+        reload:
+            "Újratöltés",
+
+        aim:
+            "Célzás",
+
+        dispersion:
+            "Szórás",
+
+        caliber:
+            "Kaliber",
+
+        traverse:
+            "Forgási sebesség",
+
+        depression:
+            "Csőlehajlás",
+
+        elevation:
+            "Csőemelés",
+
+        hullFront:
+            "Test front",
+
+        hullSide:
+            "Test oldal",
+
+        hullRear:
+            "Test hátul",
+
+        turretFront:
+            "Torony front",
+
+        turretSide:
+            "Torony oldal",
+
+        turretRear:
+            "Torony hátul",
+
+        power:
+            "Teljesítmény",
+
+        fireChance:
+            "Tűzveszély",
+
+        noDescription:
+            "Nincs leírás.",
+
+        noImage:
+            "Nincs kép",
+
+        compareBest:
+            "Zöld = legjobb érték",
+
+        compareWorst:
+            "Piros = legrosszabb érték",
+
+        footer:
+            "WOTDB – World of Tanks fan project · Nem áll kapcsolatban a Wargaminggel.",
+
+        tankDatabase:
+            "World of Tanks Tank Database"
+
+    },
+
+
+    en: {
+
+        heroTitle:
+            "World of Tanks Database",
+
+        heroText:
+            "Search, filter and compare tanks from the game.",
+
+        search:
+            "Search tank...",
+
+        allNations:
+            "All nations",
+
+        allTypes:
+            "All types",
+
+        allTiers:
+            "All tiers",
+
+        allTanks:
+            "All tanks",
+
+        premium:
+            "Premium",
+
+        standard:
+            "Standard",
+
+        sortTier:
+            "Sort by tier",
+
+        sortName:
+            "Sort by name",
+
+        sortDamage:
+            "Sort by damage",
+
+        sortDpm:
+            "Sort by DPM",
+
+        sortHp:
+            "Sort by HP",
+
+        sortPen:
+            "Sort by penetration",
+
+        reset:
+            "Reset filters",
+
+        results:
+            "Results:",
+
+        noResults:
+            "No tanks match your search.",
+
+        details:
+            "Details",
+
+        compare:
+            "Compare",
+
+        selected:
+            "✓ Selected",
+
+        chooseTanks:
+            "Select tanks",
+
+        compareNeed:
+            "You need at least 2 tanks to compare.",
+
+        compareMax:
+            "You can compare up to 4 tanks.",
+
+        basic:
+            "Basic",
+
+        gun:
+            "Gun",
+
+        mobility:
+            "Mobility",
+
+        armor:
+            "Armor",
+
+        engine:
+            "Engine",
+
+        hp:
+            "HP",
+
+        hullHp:
+            "Hull HP",
+
+        weight:
+            "Weight",
+
+        maxAmmo:
+            "Max ammo",
+
+        forward:
+            "Forward speed",
+
+        backward:
+            "Reverse speed",
+
+        radio:
+            "Radio",
+
+        gunName:
+            "Gun",
+
+        damage:
+            "Damage",
+
+        penetration:
+            "Penetration",
+
+        dpm:
+            "DPM",
+
+        reload:
+            "Reload",
+
+        aim:
+            "Aim time",
+
+        dispersion:
+            "Dispersion",
+
+        caliber:
+            "Caliber",
+
+        traverse:
+            "Traverse speed",
+
+        depression:
+            "Gun depression",
+
+        elevation:
+            "Gun elevation",
+
+        hullFront:
+            "Hull front",
+
+        hullSide:
+            "Hull side",
+
+        hullRear:
+            "Hull rear",
+
+        turretFront:
+            "Turret front",
+
+        turretSide:
+            "Turret side",
+
+        turretRear:
+            "Turret rear",
+
+        power:
+            "Power",
+
+        fireChance:
+            "Fire chance",
+
+        noDescription:
+            "No description.",
+
+        noImage:
+            "No image",
+
+        compareBest:
+            "Green = best value",
+
+        compareWorst:
+            "Red = worst value",
+
+        footer:
+            "WOTDB – World of Tanks fan project · Not affiliated with Wargaming.",
+
+        tankDatabase:
+            "World of Tanks Tank Database"
+
+    },
+
+
+    de: {
+
+        heroTitle:
+            "World of Tanks Datenbank",
+
+        heroText:
+            "Suche, filtere und vergleiche Panzer aus dem Spiel.",
+
+        search:
+            "Panzer suchen...",
+
+        allNations:
+            "Alle Nationen",
+
+        allTypes:
+            "Alle Typen",
+
+        allTiers:
+            "Alle Stufen",
+
+        allTanks:
+            "Alle Panzer",
+
+        premium:
+            "Premium",
+
+        standard:
+            "Standard",
+
+        sortTier:
+            "Nach Stufe",
+
+        sortName:
+            "Nach Name",
+
+        sortDamage:
+            "Nach Schaden",
+
+        sortDpm:
+            "Nach DPM",
+
+        sortHp:
+            "Nach HP",
+
+        sortPen:
+            "Nach Durchschlag",
+
+        reset:
+            "Filter zurücksetzen",
+
+        results:
+            "Ergebnisse:",
+
+        noResults:
+            "Keine passenden Panzer gefunden.",
+
+        details:
+            "Details",
+
+        compare:
+            "Vergleichen",
+
+        selected:
+            "✓ Ausgewählt",
+
+        chooseTanks:
+            "Panzer auswählen",
+
+        compareNeed:
+            "Mindestens 2 Panzer zum Vergleichen auswählen.",
+
+        compareMax:
+            "Du kannst bis zu 4 Panzer vergleichen.",
+
+        basic:
+            "Grunddaten",
+
+        gun:
+            "Geschütz",
+
+        mobility:
+            "Mobilität",
+
+        armor:
+            "Panzerung",
+
+        engine:
+            "Motor",
+
+        hp:
+            "HP",
+
+        hullHp:
+            "Wannen-HP",
+
+        weight:
+            "Gewicht",
+
+        maxAmmo:
+            "Max. Munition",
+
+        forward:
+            "Vorwärtsgeschwindigkeit",
+
+        backward:
+            "Rückwärtsgeschwindigkeit",
+
+        radio:
+            "Funk",
+
+        gunName:
+            "Geschütz",
+
+        damage:
+            "Schaden",
+
+        penetration:
+            "Durchschlag",
+
+        dpm:
+            "DPM",
+
+        reload:
+            "Nachladezeit",
+
+        aim:
+            "Zielzeit",
+
+        dispersion:
+            "Streuung",
+
+        caliber:
+            "Kaliber",
+
+        traverse:
+            "Drehgeschwindigkeit",
+
+        depression:
+            "Geschützsenkung",
+
+        elevation:
+            "Geschützerhöhung",
+
+        hullFront:
+            "Wannenfront",
+
+        hullSide:
+            "Wannenseite",
+
+        hullRear:
+            "Wannenheck",
+
+        turretFront:
+            "Turmfront",
+
+        turretSide:
+            "Turmseite",
+
+        turretRear:
+            "Turmheck",
+
+        power:
+            "Leistung",
+
+        fireChance:
+            "Brandwahrscheinlichkeit",
+
+        noDescription:
+            "Keine Beschreibung.",
+
+        noImage:
+            "Kein Bild",
+
+        compareBest:
+            "Grün = bester Wert",
+
+        compareWorst:
+            "Rot = schlechtester Wert",
+
+        footer:
+            "WOTDB – World of Tanks Fan-Projekt · Nicht mit Wargaming verbunden.",
+
+        tankDatabase:
+            "World of Tanks Tank-Datenbank"
+
+    },
+
+
+    fr: {
+
+        heroTitle:
+            "Base de données World of Tanks",
+
+        heroText:
+            "Recherchez, filtrez et comparez les chars du jeu.",
+
+        search:
+            "Rechercher un char...",
+
+        allNations:
+            "Toutes les nations",
+
+        allTypes:
+            "Tous les types",
+
+        allTiers:
+            "Tous les niveaux",
+
+        allTanks:
+            "Tous les chars",
+
+        premium:
+            "Premium",
+
+        standard:
+            "Standard",
+
+        sortTier:
+            "Par niveau",
+
+        sortName:
+            "Par nom",
+
+        sortDamage:
+            "Par dégâts",
+
+        sortDpm:
+            "Par DPM",
+
+        sortHp:
+            "Par PV",
+
+        sortPen:
+            "Par pénétration",
+
+        reset:
+            "Réinitialiser les filtres",
+
+        results:
+            "Résultats :",
+
+        noResults:
+            "Aucun char ne correspond à votre recherche.",
+
+        details:
+            "Détails",
+
+        compare:
+            "Comparer",
+
+        selected:
+            "✓ Sélectionné",
+
+        chooseTanks:
+            "Sélectionner des chars",
+
+        compareNeed:
+            "Sélectionnez au moins 2 chars pour comparer.",
+
+        compareMax:
+            "Vous pouvez comparer jusqu'à 4 chars.",
+
+        basic:
+            "Informations",
+
+        gun:
+            "Canon",
+
+        mobility:
+            "Mobilité",
+
+        armor:
+            "Blindage",
+
+        engine:
+            "Moteur",
+
+        hp:
+            "PV",
+
+        hullHp:
+            "PV de caisse",
+
+        weight:
+            "Poids",
+
+        maxAmmo:
+            "Munitions max.",
+
+        forward:
+            "Vitesse avant",
+
+        backward:
+            "Vitesse arrière",
+
+        radio:
+            "Radio",
+
+        gunName:
+            "Canon",
+
+        damage:
+            "Dégâts",
+
+        penetration:
+            "Pénétration",
+
+        dpm:
+            "DPM",
+
+        reload:
+            "Rechargement",
+
+        aim:
+            "Temps de visée",
+
+        dispersion:
+            "Dispersion",
+
+        caliber:
+            "Calibre",
+
+        traverse:
+            "Vitesse de rotation",
+
+        depression:
+            "Dépression",
+
+        elevation:
+            "Élévation",
+
+        hullFront:
+            "Caisse avant",
+
+        hullSide:
+            "Caisse côté",
+
+        hullRear:
+            "Caisse arrière",
+
+        turretFront:
+            "Tourelle avant",
+
+        turretSide:
+            "Tourelle côté",
+
+        turretRear:
+            "Tourelle arrière",
+
+        power:
+            "Puissance",
+
+        fireChance:
+            "Risque d'incendie",
+
+        noDescription:
+            "Aucune description.",
+
+        noImage:
+            "Aucune image",
+
+        compareBest:
+            "Vert = meilleure valeur",
+
+        compareWorst:
+            "Rouge = pire valeur",
+
+        footer:
+            "WOTDB – Projet fan World of Tanks · Non affilié à Wargaming.",
+
+        tankDatabase:
+            "Base de données World of Tanks"
+
+    },
+
+
+    pl: {
+
+        heroTitle:
+            "Baza danych World of Tanks",
+
+        heroText:
+            "Wyszukuj, filtruj i porównuj czołgi z gry.",
+
+        search:
+            "Szukaj czołgu...",
+
+        allNations:
+            "Wszystkie nacje",
+
+        allTypes:
+            "Wszystkie typy",
+
+        allTiers:
+            "Wszystkie poziomy",
+
+        allTanks:
+            "Wszystkie czołgi",
+
+        premium:
+            "Premium",
+
+        standard:
+            "Standard",
+
+        sortTier:
+            "Według poziomu",
+
+        sortName:
+            "Według nazwy",
+
+        sortDamage:
+            "Według obrażeń",
+
+        sortDpm:
+            "Według DPM",
+
+        sortHp:
+            "Według HP",
+
+        sortPen:
+            "Według penetracji",
+
+        reset:
+            "Wyczyść filtry",
+
+        results:
+            "Wyniki:",
+
+        noResults:
+            "Brak czołgów pasujących do wyszukiwania.",
+
+        details:
+            "Szczegóły",
+
+        compare:
+            "Porównaj",
+
+        selected:
+            "✓ Wybrano",
+
+        chooseTanks:
+            "Wybierz czołgi",
+
+        compareNeed:
+            "Wybierz co najmniej 2 czołgi do porównania.",
+
+        compareMax:
+            "Możesz porównać maksymalnie 4 czołgi.",
+
+        basic:
+            "Podstawowe",
+
+        gun:
+            "Działo",
+
+        mobility:
+            "Mobilność",
+
+        armor:
+            "Pancerz",
+
+        engine:
+            "Silnik",
+
+        hp:
+            "HP",
+
+        hullHp:
+            "HP kadłuba",
+
+        weight:
+            "Masa",
+
+        maxAmmo:
+            "Maks. amunicja",
+
+        forward:
+            "Prędkość do przodu",
+
+        backward:
+            "Prędkość do tyłu",
+
+        radio:
+            "Radio",
+
+        gunName:
+            "Działo",
+
+        damage:
+            "Obrażenia",
+
+        penetration:
+            "Penetracja",
+
+        dpm:
+            "DPM",
+
+        reload:
+            "Przeładowanie",
+
+        aim:
+            "Czas celowania",
+
+        dispersion:
+            "Rozrzut",
+
+        caliber:
+            "Kaliber",
+
+        traverse:
+            "Prędkość obrotu",
+
+        depression:
+            "Opuszczenie działa",
+
+        elevation:
+            "Podniesienie działa",
+
+        hullFront:
+            "Przód kadłuba",
+
+        hullSide:
+            "Bok kadłuba",
+
+        hullRear:
+            "Tył kadłuba",
+
+        turretFront:
+            "Przód wieży",
+
+        turretSide:
+            "Bok wieży",
+
+        turretRear:
+            "Tył wieży",
+
+        power:
+            "Moc",
+
+        fireChance:
+            "Szansa pożaru",
+
+        noDescription:
+            "Brak opisu.",
+
+        noImage:
+            "Brak obrazu",
+
+        compareBest:
+            "Zielony = najlepsza wartość",
+
+        compareWorst:
+            "Czerwony = najgorsza wartość",
+
+        footer:
+            "WOTDB – fanowski projekt World of Tanks · Nie jest powiązany z Wargaming.",
+
+        tankDatabase:
+            "Baza danych World of Tanks"
+
+    },
+
+
+    cs: {
+
+        heroTitle:
+            "Databáze World of Tanks",
+
+        heroText:
+            "Vyhledávejte, filtrujte a porovnávejte tanky ze hry.",
+
+        search:
+            "Hledat tank...",
+
+        allNations:
+            "Všechny národy",
+
+        allTypes:
+            "Všechny typy",
+
+        allTiers:
+            "Všechny úrovně",
+
+        allTanks:
+            "Všechny tanky",
+
+        premium:
+            "Prémiové",
+
+        standard:
+            "Standardní",
+
+        sortTier:
+            "Podle úrovně",
+
+        sortName:
+            "Podle názvu",
+
+        sortDamage:
+            "Podle poškození",
+
+        sortDpm:
+            "Podle DPM",
+
+        sortHp:
+            "Podle HP",
+
+        sortPen:
+            "Podle průbojnosti",
+
+        reset:
+            "Resetovat filtry",
+
+        results:
+            "Výsledky:",
+
+        noResults:
+            "Žádné tanky neodpovídají hledání.",
+
+        details:
+            "Podrobnosti",
+
+        compare:
+            "Porovnat",
+
+        selected:
+            "✓ Vybráno",
+
+        chooseTanks:
+            "Vyberte tanky",
+
+        compareNeed:
+            "Pro porovnání vyberte alespoň 2 tanky.",
+
+        compareMax:
+            "Můžete porovnat maximálně 4 tanky.",
+
+        basic:
+            "Základní údaje",
+
+        gun:
+            "Dělo",
+
+        mobility:
+            "Pohyblivost",
+
+        armor:
+            "Pancíř",
+
+        engine:
+            "Motor",
+
+        hp:
+            "HP",
+
+        hullHp:
+            "HP korby",
+
+        weight:
+            "Hmotnost",
+
+        maxAmmo:
+            "Max. munice",
+
+        forward:
+            "Rychlost vpřed",
+
+        backward:
+            "Rychlost vzad",
+
+        radio:
+            "Rádio",
+
+        gunName:
+            "Dělo",
+
+        damage:
+            "Poškození",
+
+        penetration:
+            "Průbojnost",
+
+        dpm:
+            "DPM",
+
+        reload:
+            "Nabíjení",
+
+        aim:
+            "Čas zaměření",
+
+        dispersion:
+            "Rozptyl",
+
+        caliber:
+            "Kalibr",
+
+        traverse:
+            "Rychlost otáčení",
+
+        depression:
+            "Sklon děla",
+
+        elevation:
+            "Zvednutí děla",
+
+        hullFront:
+            "Čelo korby",
+
+        hullSide:
+            "Bok korby",
+
+        hullRear:
+            "Zadek korby",
+
+        turretFront:
+            "Čelo věže",
+
+        turretSide:
+            "Bok věže",
+
+        turretRear:
+            "Zadek věže",
+
+        power:
+            "Výkon",
+
+        fireChance:
+            "Šance na požár",
+
+        noDescription:
+            "Bez popisu.",
+
+        noImage:
+            "Bez obrázku",
+
+        compareBest:
+            "Zelená = nejlepší hodnota",
+
+        compareWorst:
+            "Červená = nejhorší hodnota",
+
+        footer:
+            "WOTDB – fanouškovský projekt World of Tanks · Není spojen s Wargaming.",
+
+        tankDatabase:
+            "Databáze World of Tanks"
+
+    },
+
+
+    ru: {
+
+        heroTitle:
+            "База данных World of Tanks",
+
+        heroText:
+            "Ищите, фильтруйте и сравнивайте танки из игры.",
+
+        search:
+            "Поиск танка...",
+
+        allNations:
+            "Все нации",
+
+        allTypes:
+            "Все типы",
+
+        allTiers:
+            "Все уровни",
+
+        allTanks:
+            "Все танки",
+
+        premium:
+            "Премиум",
+
+        standard:
+            "Обычные",
+
+        sortTier:
+            "По уровню",
+
+        sortName:
+            "По названию",
+
+        sortDamage:
+            "По урону",
+
+        sortDpm:
+            "По DPM",
+
+        sortHp:
+            "По HP",
+
+        sortPen:
+            "По пробитию",
+
+        reset:
+            "Сбросить фильтры",
+
+        results:
+            "Результаты:",
+
+        noResults:
+            "Подходящих танков не найдено.",
+
+        details:
+            "Подробнее",
+
+        compare:
+            "Сравнить",
+
+        selected:
+            "✓ Выбрано",
+
+        chooseTanks:
+            "Выберите танки",
+
+        compareNeed:
+            "Для сравнения необходимо выбрать минимум 2 танка.",
+
+        compareMax:
+            "Можно сравнивать максимум 4 танка.",
+
+        basic:
+            "Основные характеристики",
+
+        gun:
+            "Орудие",
+
+        mobility:
+            "Мобильность",
+
+        armor:
+            "Броня",
+
+        engine:
+            "Двигатель",
+
+        hp:
+            "Прочность",
+
+        hullHp:
+            "Прочность корпуса",
+
+        weight:
+            "Масса",
+
+        maxAmmo:
+            "Макс. боекомплект",
+
+        forward:
+            "Скорость вперёд",
+
+        backward:
+            "Скорость назад",
+
+        radio:
+            "Радио",
+
+        gunName:
+            "Орудие",
+
+        damage:
+            "Урон",
+
+        penetration:
+            "Пробитие",
+
+        dpm:
+            "DPM",
+
+        reload:
+            "Перезарядка",
+
+        aim:
+            "Время сведения",
+
+        dispersion:
+            "Разброс",
+
+        caliber:
+            "Калибр",
+
+        traverse:
+            "Скорость поворота",
+
+        depression:
+            "УВН вниз",
+
+        elevation:
+            "УВН вверх",
+
+        hullFront:
+            "Лоб корпуса",
+
+        hullSide:
+            "Борт корпуса",
+
+        hullRear:
+            "Корма корпуса",
+
+        turretFront:
+            "Лоб башни",
+
+        turretSide:
+            "Борт башни",
+
+        turretRear:
+            "Корма башни",
+
+        power:
+            "Мощность",
+
+        fireChance:
+            "Вероятность пожара",
+
+        noDescription:
+            "Описание отсутствует.",
+
+        noImage:
+            "Нет изображения",
+
+        compareBest:
+            "Зелёный = лучшее значение",
+
+        compareWorst:
+            "Красный = худшее значение",
+
+        footer:
+            "WOTDB – фанатский проект World of Tanks · Не связан с Wargaming.",
+
+        tankDatabase:
+            "База данных World of Tanks"
+
+    }
+
+};
+
+
+
+/* =========================
+   CURRENT LANGUAGE
+========================= */
+
+let currentLanguage =
+    localStorage.getItem("wotdbLanguage") || "hu";
+
+let t =
+    translations[currentLanguage] ||
+    translations.hu;
+
+
+
+/* =========================
+   TANK VARIABLES
 ========================= */
 
 let tanks = [];
@@ -1334,6 +2749,234 @@ let compareList = [];
 
 
 /* =========================
+   CHANGE LANGUAGE
+========================= */
+
+function changeLanguage(language){
+
+    if(!translations[language]){
+        language = "hu";
+    }
+
+
+    currentLanguage = language;
+
+    t = translations[language];
+
+
+    localStorage.setItem(
+        "wotdbLanguage",
+        language
+    );
+
+
+    document.documentElement.lang =
+        language;
+
+
+    document.getElementById(
+        "languageSelect"
+    ).value =
+        language;
+
+
+    updateInterface();
+
+    applyFilters();
+
+}
+
+
+
+/* =========================
+   UPDATE INTERFACE
+========================= */
+
+function updateInterface(){
+
+
+    document.title =
+        "WOTDB – " +
+        t.tankDatabase;
+
+
+
+    document.getElementById(
+        "heroTitle"
+    ).textContent =
+        t.heroTitle;
+
+
+    document.getElementById(
+        "heroText"
+    ).textContent =
+        t.heroText;
+
+
+    document.getElementById(
+        "search"
+    ).placeholder =
+        t.search;
+
+
+    document.getElementById(
+        "resultsLabel"
+    ).textContent =
+        t.results;
+
+
+    document.getElementById(
+        "resetButton"
+    ).textContent =
+        t.reset;
+
+
+    document.getElementById(
+        "compareTitle"
+    ).textContent =
+        t.compare;
+
+
+    document.getElementById(
+        "compareButton"
+    ).textContent =
+        t.compare;
+
+
+    document.getElementById(
+        "compareModalTitle"
+    ).textContent =
+        t.compare;
+
+
+    document.getElementById(
+        "footerText"
+    ).textContent =
+        t.footer;
+
+
+    updateFilterTexts();
+
+    updateCompareBar();
+
+}
+
+
+
+/* =========================
+   FILTER TEXTS
+========================= */
+
+function updateFilterTexts(){
+
+
+    const nation =
+        document.getElementById(
+            "nation"
+        );
+
+
+    nation.options[0].textContent =
+        t.allNations;
+
+
+
+    const type =
+        document.getElementById(
+            "type"
+        );
+
+
+    type.options[0].textContent =
+        t.allTypes;
+
+
+
+    type.options[1].textContent =
+        getTypeName("lightTank");
+
+
+    type.options[2].textContent =
+        getTypeName("mediumTank");
+
+
+    type.options[3].textContent =
+        getTypeName("heavyTank");
+
+
+    type.options[4].textContent =
+        getTypeName("AT-SPG");
+
+
+    type.options[5].textContent =
+        "SPG";
+
+
+
+    const tier =
+        document.getElementById(
+            "tier"
+        );
+
+
+    tier.options[0].textContent =
+        t.allTiers;
+
+
+
+    const premium =
+        document.getElementById(
+            "premium"
+        );
+
+
+    premium.options[0].textContent =
+        t.allTanks;
+
+
+    premium.options[1].textContent =
+        t.premium;
+
+
+    premium.options[2].textContent =
+        t.standard;
+
+
+
+    const sort =
+        document.getElementById(
+            "sort"
+        );
+
+
+    sort.options[0].textContent =
+        t.sortTier;
+
+
+    sort.options[1].textContent =
+        t.sortName;
+
+
+    sort.options[2].textContent =
+        t.sortDamage;
+
+
+    sort.options[3].textContent =
+        t.sortDpm;
+
+
+    sort.options[4].textContent =
+        t.sortHp;
+
+
+    sort.options[5].textContent =
+        t.sortPen;
+
+}
+
+
+
+/* =========================
    LOAD TANKS
 ========================= */
 
@@ -1341,24 +2984,29 @@ async function loadTanks(){
 
     try{
 
-        const response = await fetch(
-            "tanks.json?cache=" + Date.now()
-        );
+        const response =
+            await fetch(
+                "tanks.json?cache=" +
+                Date.now()
+            );
 
 
         if(!response.ok){
 
             throw new Error(
-                "A tanks.json nem tölthető be."
+                "tanks.json error"
             );
 
         }
 
 
-        tanks = await response.json();
+        tanks =
+            await response.json();
 
 
         prepareFilters();
+
+        updateInterface();
 
         applyFilters();
 
@@ -1378,12 +3026,12 @@ async function loadTanks(){
             >
 
                 <strong>
-                    Hiba történt.
+                    Error
                 </strong>
 
                 <br><br>
 
-                A tanks.json fájl nem tölthető be.
+                tanks.json could not be loaded.
 
             </div>
 
@@ -1405,29 +3053,39 @@ function prepareFilters(){
     const nations = [
         ...new Set(
             tanks
-                .map(t => t.nation)
+                .map(
+                    t => t.nation
+                )
                 .filter(Boolean)
         )
     ].sort();
 
 
     const nationSelect =
-        document.getElementById("nation");
+        document.getElementById(
+            "nation"
+        );
 
 
     nations.forEach(nation => {
 
         const option =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
 
-        option.value = nation;
+        option.value =
+            nation;
+
 
         option.textContent =
             formatNation(nation);
 
 
-        nationSelect.appendChild(option);
+        nationSelect.appendChild(
+            option
+        );
 
     });
 
@@ -1436,7 +3094,9 @@ function prepareFilters(){
     const tiers = [
         ...new Set(
             tanks
-                .map(t => t.tier)
+                .map(
+                    t => t.tier
+                )
                 .filter(Boolean)
         )
     ].sort(
@@ -1445,22 +3105,30 @@ function prepareFilters(){
 
 
     const tierSelect =
-        document.getElementById("tier");
+        document.getElementById(
+            "tier"
+        );
 
 
     tiers.forEach(tier => {
 
         const option =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
 
-        option.value = tier;
+        option.value =
+            tier;
+
 
         option.textContent =
             "Tier " + tier;
 
 
-        tierSelect.appendChild(option);
+        tierSelect.appendChild(
+            option
+        );
 
     });
 
@@ -1476,115 +3144,125 @@ function applyFilters(){
 
 
     const search =
-        document.getElementById("search")
-        .value
+        document.getElementById(
+            "search"
+        ).value
         .toLowerCase()
         .trim();
 
 
     const nation =
-        document.getElementById("nation")
-        .value;
+        document.getElementById(
+            "nation"
+        ).value;
 
 
     const type =
-        document.getElementById("type")
-        .value;
+        document.getElementById(
+            "type"
+        ).value;
 
 
     const tier =
-        document.getElementById("tier")
-        .value;
+        document.getElementById(
+            "tier"
+        ).value;
 
 
     const premium =
-        document.getElementById("premium")
-        .value;
+        document.getElementById(
+            "premium"
+        ).value;
 
 
     const sort =
-        document.getElementById("sort")
-        .value;
+        document.getElementById(
+            "sort"
+        ).value;
 
 
 
-    filteredTanks = tanks.filter(tank => {
+    filteredTanks =
+        tanks.filter(tank => {
 
 
-        const name =
-            (tank.name || "")
-            .toLowerCase();
+            const name =
+                (
+                    tank.name || ""
+                ).toLowerCase();
 
 
-        const shortName =
-            (tank.shortName || "")
-            .toLowerCase();
+            const shortName =
+                (
+                    tank.shortName || ""
+                ).toLowerCase();
 
 
-        if(
-            search &&
-            !name.includes(search) &&
-            !shortName.includes(search)
-        ){
+            if(
+                search &&
+                !name.includes(search) &&
+                !shortName.includes(search)
+            ){
 
-            return false;
+                return false;
 
-        }
-
-
-        if(
-            nation &&
-            tank.nation !== nation
-        ){
-
-            return false;
-
-        }
+            }
 
 
-        if(
-            type &&
-            tank.type !== type
-        ){
+            if(
+                nation &&
+                tank.nation !== nation
+            ){
 
-            return false;
+                return false;
 
-        }
-
-
-        if(
-            tier &&
-            String(tank.tier) !== String(tier)
-        ){
-
-            return false;
-
-        }
+            }
 
 
-        if(
-            premium === "premium" &&
-            !tank.premium
-        ){
+            if(
+                type &&
+                tank.type !== type
+            ){
 
-            return false;
+                return false;
 
-        }
-
-
-        if(
-            premium === "standard" &&
-            tank.premium
-        ){
-
-            return false;
-
-        }
+            }
 
 
-        return true;
+            if(
+                tier &&
+                String(tank.tier) !==
+                String(tier)
+            ){
 
-    });
+                return false;
+
+            }
+
+
+            if(
+                premium === "premium" &&
+                !tank.premium
+            ){
+
+                return false;
+
+            }
+
+
+            if(
+                premium === "standard" &&
+                tank.premium
+            ){
+
+                return false;
+
+            }
+
+
+            return true;
+
+        });
 
 
 
@@ -1603,88 +3281,90 @@ function applyFilters(){
 function sortTanks(sort){
 
 
-    filteredTanks.sort((a,b) => {
+    filteredTanks.sort(
+        (a,b) => {
 
 
-        const sa =
-            a.stats || {};
+            const sa =
+                a.stats || {};
 
 
-        const sb =
-            b.stats || {};
+            const sb =
+                b.stats || {};
 
 
-        if(sort === "name"){
+            if(sort === "name"){
+
+                return (
+                    a.name || ""
+                ).localeCompare(
+                    b.name || ""
+                );
+
+            }
+
+
+            if(sort === "damage"){
+
+                return (
+                    sb.gun?.damage || 0
+                ) - (
+                    sa.gun?.damage || 0
+                );
+
+            }
+
+
+            if(sort === "dpm"){
+
+                return (
+                    sb.gun?.dpm || 0
+                ) - (
+                    sa.gun?.dpm || 0
+                );
+
+            }
+
+
+            if(sort === "hp"){
+
+                return (
+                    sb.health || 0
+                ) - (
+                    sa.health || 0
+                );
+
+            }
+
+
+            if(sort === "penetration"){
+
+                return (
+                    sb.gun?.penetration || 0
+                ) - (
+                    sa.gun?.penetration || 0
+                );
+
+            }
+
 
             return (
-                a.name || ""
-            ).localeCompare(
-                b.name || ""
+
+                (b.tier || 0)
+                -
+                (a.tier || 0)
+
+            ) || (
+
+                (a.name || "")
+                .localeCompare(
+                    b.name || ""
+                )
+
             );
 
         }
-
-
-        if(sort === "damage"){
-
-            return (
-                sb.gun?.damage || 0
-            ) - (
-                sa.gun?.damage || 0
-            );
-
-        }
-
-
-        if(sort === "dpm"){
-
-            return (
-                sb.gun?.dpm || 0
-            ) - (
-                sa.gun?.dpm || 0
-            );
-
-        }
-
-
-        if(sort === "hp"){
-
-            return (
-                sb.health || 0
-            ) - (
-                sa.health || 0
-            );
-
-        }
-
-
-        if(sort === "penetration"){
-
-            return (
-                sb.gun?.penetration || 0
-            ) - (
-                sa.gun?.penetration || 0
-            );
-
-        }
-
-
-        return (
-
-            (b.tier || 0)
-            -
-            (a.tier || 0)
-
-        ) || (
-
-            (a.name || "")
-            .localeCompare(
-                b.name || ""
-            )
-
-        );
-
-    });
+    );
 
 }
 
@@ -1746,13 +3426,16 @@ function renderTanks(){
                 s.gun || {};
 
 
-
             return `
 
-                <article class="tank-card">
+                <article
+                    class="tank-card"
+                >
 
 
-                    <div class="tank-image">
+                    <div
+                        class="tank-image"
+                    >
 
                         ${
                             tank.icon
@@ -1771,11 +3454,9 @@ function renderTanks(){
 
                             `
                             <span
-                                style="
-                                    color:#65717d;
-                                "
+                                style="color:#65717d;"
                             >
-                                Nincs kép
+                                ${t.noImage}
                             </span>
                             `
                         }
@@ -1784,24 +3465,32 @@ function renderTanks(){
 
 
 
-                    <div class="tank-content">
+                    <div
+                        class="tank-content"
+                    >
 
 
-                        <div class="tank-name">
+                        <div
+                            class="tank-name"
+                        >
 
                             ${escapeHtml(
                                 tank.name ||
-                                "Ismeretlen"
+                                "Unknown"
                             )}
 
                         </div>
 
 
 
-                        <div class="tank-meta">
+                        <div
+                            class="tank-meta"
+                        >
 
 
-                            <span class="badge tier">
+                            <span
+                                class="badge tier"
+                            >
 
                                 Tier
                                 ${tank.tier || "-"}
@@ -1809,7 +3498,9 @@ function renderTanks(){
                             </span>
 
 
-                            <span class="badge">
+                            <span
+                                class="badge"
+                            >
 
                                 ${formatType(
                                     tank.type
@@ -1824,8 +3515,10 @@ function renderTanks(){
                                 ?
 
                                 `
-                                <span class="badge premium">
-                                    PRÉMIUM
+                                <span
+                                    class="badge premium"
+                                >
+                                    ${t.premium}
                                 </span>
                                 `
 
@@ -1839,16 +3532,24 @@ function renderTanks(){
 
 
 
-                        <div class="stats">
+                        <div
+                            class="stats"
+                        >
 
 
-                            <div class="stat">
+                            <div
+                                class="stat"
+                            >
 
-                                <div class="stat-label">
-                                    HP
+                                <div
+                                    class="stat-label"
+                                >
+                                    ${t.hp}
                                 </div>
 
-                                <div class="stat-value">
+                                <div
+                                    class="stat-value"
+                                >
                                     ${formatNumber(
                                         s.health
                                     )}
@@ -1858,13 +3559,19 @@ function renderTanks(){
 
 
 
-                            <div class="stat">
+                            <div
+                                class="stat"
+                            >
 
-                                <div class="stat-label">
-                                    Sebzés
+                                <div
+                                    class="stat-label"
+                                >
+                                    ${t.damage}
                                 </div>
 
-                                <div class="stat-value">
+                                <div
+                                    class="stat-value"
+                                >
                                     ${formatNumber(
                                         gun.damage
                                     )}
@@ -1874,13 +3581,19 @@ function renderTanks(){
 
 
 
-                            <div class="stat">
+                            <div
+                                class="stat"
+                            >
 
-                                <div class="stat-label">
-                                    DPM
+                                <div
+                                    class="stat-label"
+                                >
+                                    ${t.dpm}
                                 </div>
 
-                                <div class="stat-value">
+                                <div
+                                    class="stat-value"
+                                >
                                     ${formatNumber(
                                         gun.dpm
                                     )}
@@ -1893,14 +3606,18 @@ function renderTanks(){
 
 
 
-                        <div class="card-buttons">
+                        <div
+                            class="card-buttons"
+                        >
 
 
                             <button
                                 class="btn primary"
                                 onclick="openDetails(${tank.id})"
                             >
-                                Részletek
+
+                                ${t.details}
+
                             </button>
 
 
@@ -1910,15 +3627,17 @@ function renderTanks(){
                             >
 
                                 ${
-                                    compareList.includes(tank.id)
+                                    compareList.includes(
+                                        tank.id
+                                    )
 
                                     ?
 
-                                    "✓ Kiválasztva"
+                                    t.selected
 
                                     :
 
-                                    "Összehasonlítás"
+                                    t.compare
                                 }
 
                             </button>
@@ -1950,7 +3669,7 @@ function openDetails(id){
 
     const tank =
         tanks.find(
-            t => t.id === id
+            x => x.id === id
         );
 
 
@@ -1974,10 +3693,6 @@ function openDetails(id){
         s.engine || {};
 
 
-    const turret =
-        s.turret || {};
-
-
     const mobility =
         s.mobility || {};
 
@@ -1999,10 +3714,14 @@ function openDetails(id){
     ).innerHTML = `
 
 
-        <div class="detail-top">
+        <div
+            class="detail-top"
+        >
 
 
-            <div class="detail-image">
+            <div
+                class="detail-image"
+            >
 
                 ${
                     tank.icon
@@ -2028,10 +3747,14 @@ function openDetails(id){
             <div>
 
 
-                <div class="tank-meta">
+                <div
+                    class="tank-meta"
+                >
 
 
-                    <span class="badge tier">
+                    <span
+                        class="badge tier"
+                    >
 
                         Tier
                         ${tank.tier || "-"}
@@ -2039,7 +3762,9 @@ function openDetails(id){
                     </span>
 
 
-                    <span class="badge">
+                    <span
+                        class="badge"
+                    >
 
                         ${formatNation(
                             tank.nation
@@ -2048,7 +3773,9 @@ function openDetails(id){
                     </span>
 
 
-                    <span class="badge">
+                    <span
+                        class="badge"
+                    >
 
                         ${formatType(
                             tank.type
@@ -2063,8 +3790,10 @@ function openDetails(id){
                         ?
 
                         `
-                        <span class="badge premium">
-                            PRÉMIUM
+                        <span
+                            class="badge premium"
+                        >
+                            ${t.premium}
                         </span>
                         `
 
@@ -2078,11 +3807,13 @@ function openDetails(id){
 
 
 
-                <p class="detail-description">
+                <p
+                    class="detail-description"
+                >
 
                     ${escapeHtml(
                         tank.description ||
-                        "Nincs leírás."
+                        t.noDescription
                     )}
 
                 </p>
@@ -2095,235 +3826,257 @@ function openDetails(id){
 
 
 
-        <div class="detail-section">
-
+        <div
+            class="detail-section"
+        >
 
             <h3>
-                Alapadatok
+                ${t.basic}
             </h3>
 
 
-            <div class="detail-grid">
+            <div
+                class="detail-grid"
+            >
 
 
                 ${detailStat(
-                    "HP",
+                    t.hp,
                     s.health
                 )}
 
 
                 ${detailStat(
-                    "Test HP",
+                    t.hullHp,
                     s.hullHealth
                 )}
 
 
                 ${detailStat(
-                    "Tömeg",
-                    formatNumber(s.weight) + " kg"
+                    t.weight,
+                    formatNumber(
+                        s.weight
+                    ) + " kg"
                 )}
 
 
                 ${detailStat(
-                    "Max. lőszer",
+                    t.maxAmmo,
                     s.maxAmmo
                 )}
 
 
                 ${detailStat(
-                    "Előremenet",
-                    mobility.speedForward + " km/h"
+                    t.forward,
+                    mobility.speedForward +
+                    " km/h"
                 )}
 
 
                 ${detailStat(
-                    "Hátramenet",
-                    mobility.speedBackward + " km/h"
+                    t.backward,
+                    mobility.speedBackward +
+                    " km/h"
                 )}
 
 
                 ${detailStat(
-                    "Rádió",
-                    radio.signalRange + " m"
+                    t.radio,
+                    radio.signalRange +
+                    " m"
                 )}
 
 
             </div>
 
-
         </div>
 
 
 
-        <div class="detail-section">
-
+        <div
+            class="detail-section"
+        >
 
             <h3>
-                Löveg
+                ${t.gun}
             </h3>
 
 
-            <div class="detail-grid">
+            <div
+                class="detail-grid"
+            >
 
 
                 ${detailStat(
-                    "Löveg",
+                    t.gunName,
                     gun.name
                 )}
 
 
                 ${detailStat(
-                    "Sebzés",
+                    t.damage,
                     gun.damage
                 )}
 
 
                 ${detailStat(
-                    "Penetráció",
+                    t.penetration,
                     gun.penetration
                 )}
 
 
                 ${detailStat(
-                    "DPM",
+                    t.dpm,
                     gun.dpm
                 )}
 
 
                 ${detailStat(
-                    "Újratöltés",
+                    t.reload,
                     gun.reload + " s"
                 )}
 
 
                 ${detailStat(
-                    "Célzás",
+                    t.aim,
                     gun.aimTime + " s"
                 )}
 
 
                 ${detailStat(
-                    "Szórás",
+                    t.dispersion,
                     gun.dispersion
                 )}
 
 
                 ${detailStat(
-                    "Kaliber",
+                    t.caliber,
                     gun.caliber + " mm"
                 )}
 
 
                 ${detailStat(
-                    "Forgási sebesség",
-                    gun.traverseSpeed + " °/s"
+                    t.traverse,
+                    gun.traverseSpeed +
+                    " °/s"
                 )}
 
 
                 ${detailStat(
-                    "Csőlehajlás",
+                    t.depression,
                     gun.depression + "°"
                 )}
 
 
                 ${detailStat(
-                    "Csőemelés",
+                    t.elevation,
                     gun.elevation + "°"
                 )}
 
 
             </div>
 
-
         </div>
 
 
 
-        <div class="detail-section">
-
+        <div
+            class="detail-section"
+        >
 
             <h3>
-                Páncélzat
+                ${t.armor}
             </h3>
 
 
-            <div class="detail-grid">
+            <div
+                class="detail-grid"
+            >
 
 
                 ${detailStat(
-                    "Test front",
-                    armor.hull?.front + " mm"
+                    t.hullFront,
+                    armor.hull?.front +
+                    " mm"
                 )}
 
 
                 ${detailStat(
-                    "Test oldal",
-                    armor.hull?.side + " mm"
+                    t.hullSide,
+                    armor.hull?.side +
+                    " mm"
                 )}
 
 
                 ${detailStat(
-                    "Test hátul",
-                    armor.hull?.rear + " mm"
+                    t.hullRear,
+                    armor.hull?.rear +
+                    " mm"
                 )}
 
 
                 ${detailStat(
-                    "Torony front",
-                    armor.turret?.front + " mm"
+                    t.turretFront,
+                    armor.turret?.front +
+                    " mm"
                 )}
 
 
                 ${detailStat(
-                    "Torony oldal",
-                    armor.turret?.side + " mm"
+                    t.turretSide,
+                    armor.turret?.side +
+                    " mm"
                 )}
 
 
                 ${detailStat(
-                    "Torony hátul",
-                    armor.turret?.rear + " mm"
+                    t.turretRear,
+                    armor.turret?.rear +
+                    " mm"
                 )}
 
 
             </div>
 
-
         </div>
 
 
 
-        <div class="detail-section">
-
+        <div
+            class="detail-section"
+        >
 
             <h3>
-                Motor
+                ${t.engine}
             </h3>
 
 
-            <div class="detail-grid">
+            <div
+                class="detail-grid"
+            >
 
 
                 ${detailStat(
-                    "Motor",
+                    t.engine,
                     engine.name
                 )}
 
 
                 ${detailStat(
-                    "Teljesítmény",
-                    engine.power + " LE"
+                    t.power,
+                    engine.power +
+                    " hp"
                 )}
 
 
                 ${detailStat(
-                    "Tűzveszély",
-                    ((engine.fireChance || 0) * 100) + "%"
+                    t.fireChance,
+                    ((engine.fireChance || 0) * 100) +
+                    "%"
                 )}
 
 
             </div>
-
 
         </div>
 
@@ -2345,8 +4098,10 @@ function openDetails(id){
    DETAIL STAT
 ========================= */
 
-function detailStat(label,value){
-
+function detailStat(
+    label,
+    value
+){
 
     if(
         value === undefined ||
@@ -2361,7 +4116,9 @@ function detailStat(label,value){
 
     return `
 
-        <div class="detail-stat">
+        <div
+            class="detail-stat"
+        >
 
             <small>
                 ${escapeHtml(label)}
@@ -2405,7 +4162,7 @@ function toggleCompare(id){
         ){
 
             alert(
-                "Legfeljebb 4 tankot hasonlíthatsz össze."
+                t.compareMax
             );
 
             return;
@@ -2439,17 +4196,22 @@ function updateCompareBar(){
         );
 
 
-    if(!compareList.length){
+    if(
+        !compareList.length
+    ){
 
         container.innerHTML = `
 
             <span
+                id="compareEmpty"
                 style="
                     color:#7f8b96;
                     font-size:12px;
                 "
             >
-                Válassz tankokat
+
+                ${t.chooseTanks}
+
             </span>
 
         `;
@@ -2467,13 +4229,15 @@ function updateCompareBar(){
 
             const tank =
                 tanks.find(
-                    t => t.id === id
+                    x => x.id === id
                 );
 
 
             return `
 
-                <div class="compare-item">
+                <div
+                    class="compare-item"
+                >
 
                     ${escapeHtml(
                         tank?.name ||
@@ -2511,7 +4275,7 @@ function openCompare(){
     ){
 
         alert(
-            "Legalább 2 tank szükséges az összehasonlításhoz."
+            t.compareNeed
         );
 
         return;
@@ -2525,7 +4289,7 @@ function openCompare(){
         .map(
             id =>
                 tanks.find(
-                    t => t.id === id
+                    x => x.id === id
                 )
         )
         .filter(Boolean);
@@ -2537,23 +4301,24 @@ function openCompare(){
 
         {
 
-            section:"Alapadatok",
+            section:
+                t.basic,
 
             values:[
 
                 [
                     "Tier",
-                    t => t.tier
+                    x => x.tier
                 ],
 
                 [
-                    "HP",
-                    t => t.stats?.health
+                    t.hp,
+                    x => x.stats?.health
                 ],
 
                 [
-                    "Tömeg",
-                    t => t.stats?.weight
+                    t.weight,
+                    x => x.stats?.weight
                 ]
 
             ]
@@ -2563,43 +4328,44 @@ function openCompare(){
 
         {
 
-            section:"Löveg",
+            section:
+                t.gun,
 
             values:[
 
                 [
-                    "Sebzés",
-                    t => t.stats?.gun?.damage
+                    t.damage,
+                    x => x.stats?.gun?.damage
                 ],
 
                 [
-                    "Penetráció",
-                    t => t.stats?.gun?.penetration
+                    t.penetration,
+                    x => x.stats?.gun?.penetration
                 ],
 
                 [
-                    "DPM",
-                    t => t.stats?.gun?.dpm
+                    t.dpm,
+                    x => x.stats?.gun?.dpm
                 ],
 
                 [
-                    "Újratöltés",
-                    t => t.stats?.gun?.reload
+                    t.reload,
+                    x => x.stats?.gun?.reload
                 ],
 
                 [
-                    "Célzás",
-                    t => t.stats?.gun?.aimTime
+                    t.aim,
+                    x => x.stats?.gun?.aimTime
                 ],
 
                 [
-                    "Szórás",
-                    t => t.stats?.gun?.dispersion
+                    t.dispersion,
+                    x => x.stats?.gun?.dispersion
                 ],
 
                 [
-                    "Csőlehajlás",
-                    t => t.stats?.gun?.depression
+                    t.depression,
+                    x => x.stats?.gun?.depression
                 ]
 
             ]
@@ -2609,23 +4375,24 @@ function openCompare(){
 
         {
 
-            section:"Mobilitás",
+            section:
+                t.mobility,
 
             values:[
 
                 [
-                    "Előremeneti sebesség",
-                    t => t.stats?.mobility?.speedForward
+                    t.forward,
+                    x => x.stats?.mobility?.speedForward
                 ],
 
                 [
-                    "Hátrameneti sebesség",
-                    t => t.stats?.mobility?.speedBackward
+                    t.backward,
+                    x => x.stats?.mobility?.speedBackward
                 ],
 
                 [
-                    "Motor",
-                    t => t.stats?.engine?.power
+                    t.power,
+                    x => x.stats?.engine?.power
                 ]
 
             ]
@@ -2635,44 +4402,44 @@ function openCompare(){
 
         {
 
-            section:"Páncélzat",
+            section:
+                t.armor,
 
             values:[
 
                 [
-                    "Test front",
-                    t => t.stats?.armor?.hull?.front
+                    t.hullFront,
+                    x => x.stats?.armor?.hull?.front
                 ],
 
                 [
-                    "Test oldal",
-                    t => t.stats?.armor?.hull?.side
+                    t.hullSide,
+                    x => x.stats?.armor?.hull?.side
                 ],
 
                 [
-                    "Test hátul",
-                    t => t.stats?.armor?.hull?.rear
+                    t.hullRear,
+                    x => x.stats?.armor?.hull?.rear
                 ],
 
                 [
-                    "Torony front",
-                    t => t.stats?.armor?.turret?.front
+                    t.turretFront,
+                    x => x.stats?.armor?.turret?.front
                 ],
 
                 [
-                    "Torony oldal",
-                    t => t.stats?.armor?.turret?.side
+                    t.turretSide,
+                    x => x.stats?.armor?.turret?.side
                 ],
 
                 [
-                    "Torony hátul",
-                    t => t.stats?.armor?.turret?.rear
+                    t.turretRear,
+                    x => x.stats?.armor?.turret?.rear
                 ]
 
             ]
 
         }
-
 
     ];
 
@@ -2680,10 +4447,13 @@ function openCompare(){
 
     let html = `
 
-        <div class="table-wrap">
+        <div
+            class="table-wrap"
+        >
 
-            <table class="compare-table">
-
+            <table
+                class="compare-table"
+            >
 
                 <thead>
 
@@ -2695,15 +4465,17 @@ function openCompare(){
 
                         ${
                             selected
-                            .map(t => `
+                            .map(
+                                tank => `
 
                                 <th>
                                     ${escapeHtml(
-                                        t.name
+                                        tank.name
                                     )}
                                 </th>
 
-                            `)
+                                `
+                            )
                             .join("")
                         }
 
@@ -2718,163 +4490,187 @@ function openCompare(){
 
 
 
-    rows.forEach(group => {
-
-
-        html += `
-
-            <tr class="section-row">
-
-                <td
-                    colspan="${selected.length + 1}"
-                >
-
-                    ${group.section}
-
-                </td>
-
-            </tr>
-
-        `;
-
-
-
-        group.values.forEach(row => {
-
-
-            const values =
-                selected.map(t => {
-
-
-                    const value =
-                        row[1](t);
-
-
-                    return Number.isFinite(
-                        Number(value)
-                    )
-
-                    ?
-
-                    Number(value)
-
-                    :
-
-                    null;
-
-                });
-
-
-
-            const valid =
-                values.filter(
-                    v => v !== null
-                );
-
-
-
-            let best = null;
-
-            let worst = null;
-
-
-
-            if(
-                valid.length > 1
-            ){
-
-                best =
-                    Math.max(...valid);
-
-                worst =
-                    Math.min(...valid);
-
-            }
-
+    rows.forEach(
+        group => {
 
 
             html += `
 
-                <tr>
+                <tr
+                    class="section-row"
+                >
 
-                    <td>
-                        ${escapeHtml(row[0])}
+                    <td
+                        colspan="${
+                            selected.length + 1
+                        }"
+                    >
+
+                        ${group.section}
+
                     </td>
-
-
-                    ${
-                        values
-                        .map(value => {
-
-
-                            if(
-                                value === null
-                            ){
-
-                                return `
-                                    <td>
-                                        -
-                                    </td>
-                                `;
-
-                            }
-
-
-
-                            let cls = "";
-
-
-
-                            if(
-                                valid.length > 1
-                            ){
-
-                                if(
-                                    value === best
-                                ){
-
-                                    cls = "best";
-
-                                }
-
-
-                                if(
-                                    value === worst
-                                ){
-
-                                    cls = "worst";
-
-                                }
-
-                            }
-
-
-
-                            return `
-
-                                <td
-                                    class="${cls}"
-                                >
-
-                                    ${formatNumber(
-                                        value
-                                    )}
-
-                                </td>
-
-                            `;
-
-                        })
-                        .join("")
-                    }
 
                 </tr>
 
             `;
 
-        });
 
-    });
+
+            group.values.forEach(
+                row => {
+
+
+                    const values =
+                        selected.map(
+                            tank => {
+
+
+                                const value =
+                                    row[1](tank);
+
+
+                                return Number.isFinite(
+                                    Number(value)
+                                )
+
+                                ?
+
+                                Number(value)
+
+                                :
+
+                                null;
+
+                            }
+                        );
+
+
+
+                    const valid =
+                        values.filter(
+                            value =>
+                                value !== null
+                        );
+
+
+
+                    let best =
+                        null;
+
+                    let worst =
+                        null;
+
+
+
+                    if(
+                        valid.length > 1
+                    ){
+
+                        best =
+                            Math.max(
+                                ...valid
+                            );
+
+                        worst =
+                            Math.min(
+                                ...valid
+                            );
+
+                    }
+
+
+
+                    html += `
+
+                        <tr>
+
+                            <td>
+                                ${escapeHtml(
+                                    row[0]
+                                )}
+                            </td>
+
+
+                            ${
+                                values
+                                .map(
+                                    value => {
+
+
+                                        if(
+                                            value === null
+                                        ){
+
+                                            return `
+                                                <td>
+                                                    -
+                                                </td>
+                                            `;
+
+                                        }
+
+
+
+                                        let cls =
+                                            "";
+
+
+
+                                        if(
+                                            valid.length > 1
+                                        ){
+
+                                            if(
+                                                value === best
+                                            ){
+
+                                                cls =
+                                                    "best";
+
+                                            }
+
+
+                                            if(
+                                                value === worst
+                                            ){
+
+                                                cls =
+                                                    "worst";
+
+                                            }
+
+                                        }
+
+
+
+                                        return `
+
+                                            <td
+                                                class="${cls}"
+                                            >
+
+                                                ${formatNumber(
+                                                    value
+                                                )}
+
+                                            </td>
+
+                                        `;
+
+                                    }
+                                )
+                                .join("")
+                            }
+
+                        </tr>
+
+                    `;
+
+                }
+            );
+
+        }
+    );
 
 
 
@@ -2895,9 +4691,9 @@ function openCompare(){
             "
         >
 
-            Zöld = legjobb érték
+            ${t.compareBest}
             ·
-            Piros = legrosszabb érték
+            ${t.compareWorst}
 
         </p>
 
@@ -2926,14 +4722,18 @@ function openCompare(){
    MODALS
 ========================= */
 
-function closeModal(event,id){
-
+function closeModal(
+    event,
+    id
+){
 
     if(
         event.target.id === id
     ){
 
-        closeSpecificModal(id);
+        closeSpecificModal(
+            id
+        );
 
     }
 
@@ -2942,7 +4742,6 @@ function closeModal(event,id){
 
 
 function closeSpecificModal(id){
-
 
     document.getElementById(
         id
@@ -2958,13 +4757,14 @@ document.addEventListener(
     "keydown",
     event => {
 
-
         if(
             event.key === "Escape"
         ){
 
             document
-                .querySelectorAll(".modal")
+                .querySelectorAll(
+                    ".modal"
+                )
                 .forEach(
                     modal =>
                         modal.classList.remove(
@@ -2980,7 +4780,7 @@ document.addEventListener(
 
 
 /* =========================
-   RESET FILTERS
+   RESET
 ========================= */
 
 function resetFilters(){
@@ -3023,7 +4823,7 @@ function resetFilters(){
 
 
 /* =========================
-   FORMAT NATION
+   NATION
 ========================= */
 
 function formatNation(nation){
@@ -3032,58 +4832,115 @@ function formatNation(nation){
     const names = {
 
 
-        ussr:
-            "Szovjetunió",
+        hu:{
+            ussr:"Szovjetunió",
+            germany:"Németország",
+            usa:"USA",
+            uk:"Egyesült Királyság",
+            france:"Franciaország",
+            czech:"Csehszlovákia",
+            japan:"Japán",
+            china:"Kína",
+            sweden:"Svédország",
+            poland:"Lengyelország",
+            italy:"Olaszország"
+        },
 
 
-        germany:
-            "Németország",
+        en:{
+            ussr:"USSR",
+            germany:"Germany",
+            usa:"USA",
+            uk:"United Kingdom",
+            france:"France",
+            czech:"Czechoslovakia",
+            japan:"Japan",
+            china:"China",
+            sweden:"Sweden",
+            poland:"Poland",
+            italy:"Italy"
+        },
 
 
-        usa:
-            "USA",
+        de:{
+            ussr:"UdSSR",
+            germany:"Deutschland",
+            usa:"USA",
+            uk:"Großbritannien",
+            france:"Frankreich",
+            czech:"Tschechoslowakei",
+            japan:"Japan",
+            china:"China",
+            sweden:"Schweden",
+            poland:"Polen",
+            italy:"Italien"
+        },
 
 
-        uk:
-            "Egyesült Királyság",
+        fr:{
+            ussr:"URSS",
+            germany:"Allemagne",
+            usa:"États-Unis",
+            uk:"Royaume-Uni",
+            france:"France",
+            czech:"Tchécoslovaquie",
+            japan:"Japon",
+            china:"Chine",
+            sweden:"Suède",
+            poland:"Pologne",
+            italy:"Italie"
+        },
 
 
-        france:
-            "Franciaország",
+        pl:{
+            ussr:"ZSRR",
+            germany:"Niemcy",
+            usa:"USA",
+            uk:"Wielka Brytania",
+            france:"Francja",
+            czech:"Czechosłowacja",
+            japan:"Japonia",
+            china:"Chiny",
+            sweden:"Szwecja",
+            poland:"Polska",
+            italy:"Włochy"
+        },
 
 
-        czech:
-            "Csehszlovákia",
+        cs:{
+            ussr:"SSSR",
+            germany:"Německo",
+            usa:"USA",
+            uk:"Velká Británie",
+            france:"Francie",
+            czech:"Československo",
+            japan:"Japonsko",
+            china:"Čína",
+            sweden:"Švédsko",
+            poland:"Polsko",
+            italy:"Itálie"
+        },
 
 
-        japan:
-            "Japán",
-
-
-        china:
-            "Kína",
-
-
-        sweden:
-            "Svédország",
-
-
-        poland:
-            "Lengyelország",
-
-
-        italy:
-            "Olaszország",
-
-
-        common_test:
-            "Common Test"
+        ru:{
+            ussr:"СССР",
+            germany:"Германия",
+            usa:"США",
+            uk:"Великобритания",
+            france:"Франция",
+            czech:"Чехословакия",
+            japan:"Япония",
+            china:"Китай",
+            sweden:"Швеция",
+            poland:"Польша",
+            italy:"Италия"
+        }
 
     };
 
 
     return (
-        names[nation] ||
+        names[currentLanguage]?.[nation] ||
         nation ||
         "-"
     );
@@ -3093,39 +4950,82 @@ function formatNation(nation){
 
 
 /* =========================
-   FORMAT TYPE
+   TYPE
 ========================= */
 
-function formatType(type){
+function getTypeName(type){
 
 
-    const names = {
+    const types = {
 
 
-        lightTank:
-            "Light",
+        hu:{
+            lightTank:"Light",
+            mediumTank:"Medium",
+            heavyTank:"Heavy",
+            "AT-SPG":"Tank Destroyer",
+            SPG:"SPG"
+        },
 
 
-        mediumTank:
-            "Medium",
+        en:{
+            lightTank:"Light",
+            mediumTank:"Medium",
+            heavyTank:"Heavy",
+            "AT-SPG":"Tank Destroyer",
+            SPG:"SPG"
+        },
 
 
-        heavyTank:
-            "Heavy",
+        de:{
+            lightTank:"Leicht",
+            mediumTank:"Mittlerer",
+            heavyTank:"Schwerer",
+            "AT-SPG":"Jagdpanzer",
+            SPG:"Artillerie"
+        },
 
 
-        "AT-SPG":
-            "Tank Destroyer",
+        fr:{
+            lightTank:"Léger",
+            mediumTank:"Moyen",
+            heavyTank:"Lourd",
+            "AT-SPG":"Chasseur de chars",
+            SPG:"Artillerie"
+        },
 
 
-        SPG:
-            "SPG"
+        pl:{
+            lightTank:"Lekki",
+            mediumTank:"Średni",
+            heavyTank:"Ciężki",
+            "AT-SPG":"Niszczyciel czołgów",
+            SPG:"Artyleria"
+        },
+
+
+        cs:{
+            lightTank:"Lehký",
+            mediumTank:"Střední",
+            heavyTank:"Těžký",
+            "AT-SPG":"Stíhač tanků",
+            SPG:"Dělostřelectvo"
+        },
+
+
+        ru:{
+            lightTank:"Лёгкий",
+            mediumTank:"Средний",
+            heavyTank:"Тяжёлый",
+            "AT-SPG":"ПТ-САУ",
+            SPG:"САУ"
+        }
 
     };
 
 
     return (
-        names[type] ||
+        types[currentLanguage]?.[type] ||
         type ||
         "-"
     );
@@ -3134,8 +5034,16 @@ function formatType(type){
 
 
 
+function formatType(type){
+
+    return getTypeName(type);
+
+}
+
+
+
 /* =========================
-   FORMAT NUMBER
+   NUMBER
 ========================= */
 
 function formatNumber(value){
@@ -3166,7 +5074,19 @@ function formatNumber(value){
 
 
     return number.toLocaleString(
-        "hu-HU",
+        currentLanguage === "en"
+        ? "en-US"
+        : currentLanguage === "de"
+        ? "de-DE"
+        : currentLanguage === "fr"
+        ? "fr-FR"
+        : currentLanguage === "pl"
+        ? "pl-PL"
+        : currentLanguage === "cs"
+        ? "cs-CZ"
+        : currentLanguage === "ru"
+        ? "ru-RU"
+        : "hu-HU",
         {
             maximumFractionDigits:2
         }
@@ -3181,7 +5101,6 @@ function formatNumber(value){
 ========================= */
 
 function escapeHtml(value){
-
 
     return String(value)
 
@@ -3219,7 +5138,9 @@ function escapeHtml(value){
 ========================= */
 
 document
-    .getElementById("search")
+    .getElementById(
+        "search"
+    )
     .addEventListener(
         "input",
         applyFilters
@@ -3227,7 +5148,9 @@ document
 
 
 document
-    .getElementById("nation")
+    .getElementById(
+        "nation"
+    )
     .addEventListener(
         "change",
         applyFilters
@@ -3235,7 +5158,9 @@ document
 
 
 document
-    .getElementById("type")
+    .getElementById(
+        "type"
+    )
     .addEventListener(
         "change",
         applyFilters
@@ -3243,7 +5168,9 @@ document
 
 
 document
-    .getElementById("tier")
+    .getElementById(
+        "tier"
+    )
     .addEventListener(
         "change",
         applyFilters
@@ -3251,7 +5178,9 @@ document
 
 
 document
-    .getElementById("premium")
+    .getElementById(
+        "premium"
+    )
     .addEventListener(
         "change",
         applyFilters
@@ -3259,7 +5188,9 @@ document
 
 
 document
-    .getElementById("sort")
+    .getElementById(
+        "sort"
+    )
     .addEventListener(
         "change",
         applyFilters
@@ -3270,6 +5201,14 @@ document
 /* =========================
    START
 ========================= */
+
+document.getElementById(
+    "languageSelect"
+).value =
+    currentLanguage;
+
+
+updateInterface();
 
 loadTanks();
 
