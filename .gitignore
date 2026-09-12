@@ -1,0 +1,13 @@
+# Lokális mentések, tesztadatok és frissítési naplók
+backup/
+testing/
+logs/
+
+# Véletlenül az images mappába másolt forrásfájlok
+images/index.html
+images/tanks.json
+images/update_tanks.py
+
+# Python gyorsítótár
+__pycache__/
+*.py[cod]

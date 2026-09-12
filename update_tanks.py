@@ -270,6 +270,14 @@ def download_image(url, tank_id):
 
     IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Az automatikus frissítésnél nem töltjük le újra a már meglévő
+    # tankképeket. Új tankhoz (vagy hiányzó képhez) továbbra is letölti.
+    for extension in (".png", ".jpg", ".jpeg", ".webp"):
+        existing_path = IMAGE_DIR / f"{tank_id}{extension}"
+
+        if existing_path.is_file() and existing_path.stat().st_size >= 100:
+            return existing_path.as_posix()
+
     try:
         request = session.get(
             url,
