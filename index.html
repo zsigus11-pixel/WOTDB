@@ -1,0 +1,2396 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WOTDB – World of Tanks Database</title>
+
+<style>
+:root{
+    --bg:#10151b;
+    --panel:#171e26;
+    --panel2:#1c2530;
+    --border:#2b3744;
+    --text:#f2f5f7;
+    --muted:#9ca9b5;
+    --accent:#4da3ff;
+    --accent2:#2f7fd3;
+    --green:#42d392;
+    --red:#ff6262;
+    --gold:#e8b84a;
+}
+
+*{box-sizing:border-box;}
+
+html{scroll-behavior:smooth;}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+button,input,select{font:inherit;}
+button{cursor:pointer;}
+
+header{
+    height:68px;
+    border-bottom:1px solid var(--border);
+    background:#141a21;
+    display:flex;
+    align-items:center;
+    padding:0 28px;
+}
+
+.header-inner{
+    width:100%;
+    max-width:1400px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.logo-mark{
+    width:38px;
+    height:38px;
+    border-radius:8px;
+    background:var(--accent);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    font-size:18px;
+}
+
+.logo-text{
+    font-size:21px;
+    font-weight:800;
+    letter-spacing:.5px;
+}
+
+.logo-text span{color:var(--accent);}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.header-info{
+    color:var(--muted);
+    font-size:13px;
+}
+
+.language-select{
+    height:38px;
+    min-width:125px;
+    border:1px solid var(--border);
+    background:#11171e;
+    color:white;
+    border-radius:7px;
+    padding:0 10px;
+    outline:none;
+}
+
+.language-select:focus{border-color:var(--accent);}
+
+main{
+    max-width:1400px;
+    margin:auto;
+    padding:30px 24px 110px;
+}
+
+.hero{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:28px;
+    margin-bottom:22px;
+}
+
+.hero h1{
+    margin:0 0 8px;
+    font-size:30px;
+}
+
+.hero p{
+    margin:0;
+    color:var(--muted);
+    font-size:15px;
+}
+
+.filters{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:22px;
+}
+
+.filter-row{
+    display:grid;
+    grid-template-columns:2fr repeat(5,1fr);
+    gap:10px;
+}
+
+.search input,select{
+    width:100%;
+    height:42px;
+    border:1px solid var(--border);
+    background:#11171e;
+    color:var(--text);
+    border-radius:7px;
+    padding:0 12px;
+    outline:none;
+}
+
+.search input:focus,select:focus{
+    border-color:var(--accent);
+}
+
+.reset-btn{
+    margin-top:12px;
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:8px 13px;
+}
+
+.reset-btn:hover{
+    color:white;
+    border-color:var(--accent);
+}
+
+.results-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+}
+
+.results-count{
+    color:var(--muted);
+    font-size:14px;
+}
+
+.results-count strong{color:white;}
+
+.tank-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+}
+
+.tank-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    transition:.15s ease;
+}
+
+.tank-card:hover{
+    border-color:#425365;
+    transform:translateY(-2px);
+}
+
+.tank-image{
+    height:190px;
+    background:
+        radial-gradient(circle at center,#1d2833 0%,#11171e 70%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-bottom:1px solid var(--border);
+    overflow:visible;
+    position:relative;
+    padding:8px;
+}
+
+.tank-image img{
+    width:auto;
+    height:auto;
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    object-position:center;
+    display:block;
+}
+
+.tank-image .image-fallback{
+    color:#65717d;
+    font-size:12px;
+}
+
+.tank-content{padding:14px;}
+
+.tank-name{
+    font-size:17px;
+    font-weight:700;
+    margin-bottom:6px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.tank-meta{
+    display:flex;
+    gap:7px;
+    flex-wrap:wrap;
+    margin-bottom:13px;
+}
+
+.badge{
+    font-size:11px;
+    padding:4px 7px;
+    border-radius:4px;
+    background:#252f3a;
+    color:#cbd4dc;
+}
+
+.badge.tier{
+    color:#fff;
+    background:#344252;
+}
+
+.badge.premium{
+    color:#161616;
+    background:var(--gold);
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+    margin-bottom:13px;
+}
+
+.stat{
+    background:#121820;
+    border-radius:6px;
+    padding:8px;
+}
+
+.stat-label{
+    font-size:10px;
+    color:var(--muted);
+    margin-bottom:3px;
+}
+
+.stat-value{
+    font-size:13px;
+    font-weight:700;
+}
+
+.card-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+}
+
+.btn{
+    border:1px solid var(--border);
+    background:#202a35;
+    color:white;
+    border-radius:6px;
+    padding:8px;
+    font-size:12px;
+}
+
+.btn:hover{border-color:var(--accent);}
+
+.btn.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+}
+
+.btn.primary:hover{background:var(--accent2);}
+
+.empty{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:50px 20px;
+    text-align:center;
+    color:var(--muted);
+}
+
+.compare-bar{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    background:#151c24;
+    border-top:1px solid var(--border);
+    padding:12px 20px;
+    z-index:50;
+}
+
+.compare-inner{
+    max-width:1400px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.compare-title{
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.compare-items{
+    display:flex;
+    gap:8px;
+    flex:1;
+    overflow:auto;
+}
+
+.compare-item{
+    background:#222c37;
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:7px 10px;
+    white-space:nowrap;
+    font-size:12px;
+}
+
+.remove-compare{
+    margin-left:7px;
+    color:#ff7777;
+    cursor:pointer;
+}
+
+.compare-action{
+    background:var(--accent);
+    color:white;
+    border:0;
+    border-radius:6px;
+    padding:9px 15px;
+    white-space:nowrap;
+}
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+}
+
+.modal.active{display:flex;}
+
+.modal-box{
+    width:100%;
+    max-width:950px;
+    max-height:90vh;
+    overflow:auto;
+    background:#171e26;
+    border:1px solid var(--border);
+    border-radius:12px;
+}
+
+.modal-header{
+    padding:18px 20px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    background:#171e26;
+    z-index:2;
+}
+
+.modal-header h2{
+    margin:0;
+    font-size:20px;
+}
+
+.close{
+    border:0;
+    background:transparent;
+    color:var(--muted);
+    font-size:25px;
+    line-height:1;
+}
+
+.close:hover{color:white;}
+
+.modal-body{padding:20px;}
+
+.detail-top{
+    display:grid;
+    grid-template-columns:300px 1fr;
+    gap:20px;
+    margin-bottom:22px;
+}
+
+.detail-image{
+    min-height:210px;
+    background:
+        radial-gradient(circle at center,#1d2833 0%,#11171e 70%);
+    border:1px solid var(--border);
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:visible;
+    padding:8px;
+}
+
+.detail-image img{
+    width:auto;
+    height:auto;
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    object-position:center;
+    display:block;
+}
+
+.detail-description{
+    color:var(--muted);
+    line-height:1.6;
+    font-size:14px;
+}
+
+.detail-section{margin-top:20px;}
+
+.detail-section h3{
+    margin:0 0 10px;
+    font-size:15px;
+    color:white;
+}
+
+.detail-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+}
+
+.detail-stat{
+    background:#111820;
+    border:1px solid var(--border);
+    padding:10px;
+    border-radius:6px;
+}
+
+.detail-stat small{
+    display:block;
+    color:var(--muted);
+    margin-bottom:4px;
+}
+
+.detail-stat strong{font-size:14px;}
+
+.table-wrap{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+}
+
+.compare-table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:700px;
+}
+
+.compare-table th,.compare-table td{
+    border-bottom:1px solid var(--border);
+    padding:11px;
+    text-align:center;
+}
+
+.compare-table th{background:#121820;}
+
+.compare-table th:first-child,
+.compare-table td:first-child{text-align:left;}
+
+.best{
+    color:var(--green);
+    font-weight:800;
+}
+
+.worst{
+    color:var(--red);
+    font-weight:800;
+}
+
+.section-row td{
+    background:#202a35;
+    color:#cbd4dc;
+    font-weight:700;
+    text-align:left !important;
+}
+
+.compare-tank-head{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:7px;
+}
+
+.compare-tank-head img{
+    width:110px;
+    height:70px;
+    object-fit:contain;
+}
+
+.loading{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:50px;
+    text-align:center;
+    color:var(--muted);
+}
+
+.error-box{
+    background:#24191b;
+    border:1px solid #5a2b30;
+    color:#ffb2b2;
+    border-radius:10px;
+    padding:18px;
+    line-height:1.6;
+}
+
+footer{
+    text-align:center;
+    color:#687582;
+    font-size:12px;
+    padding:25px;
+}
+
+@media(max-width:1100px){
+    .tank-grid{grid-template-columns:repeat(3,1fr);}
+    .filter-row{grid-template-columns:repeat(3,1fr);}
+    .search{grid-column:1/-1;}
+}
+
+@media(max-width:750px){
+    header{
+        height:auto;
+        min-height:60px;
+        padding:10px 14px;
+    }
+
+    .header-info{display:none;}
+
+    .header-inner{flex-wrap:wrap;}
+
+    .header-right{
+        margin-left:auto;
+    }
+
+    .language-select{
+        min-width:110px;
+        height:36px;
+        font-size:12px;
+    }
+
+    .logo-mark{
+        width:34px;
+        height:34px;
+        font-size:16px;
+    }
+
+    .logo-text{font-size:19px;}
+
+    main{padding:16px 10px 100px;}
+
+    .hero{
+        padding:18px;
+        margin-bottom:14px;
+    }
+
+    .hero h1{font-size:22px;}
+
+    .hero p{
+        font-size:13px;
+        line-height:1.5;
+    }
+
+    .filters{
+        padding:12px;
+        margin-bottom:16px;
+    }
+
+    .filter-row{
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+    }
+
+    .search{grid-column:1/-1;}
+
+    .search input,select{
+        height:40px;
+        font-size:13px;
+    }
+
+    .tank-grid{
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+    }
+
+    .tank-image{height:145px; padding:8px;}
+
+    .tank-image img{
+        max-height:100%;
+        max-width:100%;
+    }
+
+    .tank-content{padding:9px;}
+
+    .tank-name{
+        font-size:13px;
+        margin-bottom:5px;
+    }
+
+    .tank-meta{
+        gap:3px;
+        margin-bottom:8px;
+    }
+
+    .badge{
+        font-size:9px;
+        padding:3px 5px;
+    }
+
+    .stats{
+        grid-template-columns:1fr 1fr;
+        gap:5px;
+        margin-bottom:8px;
+    }
+
+    .stats .stat:last-child{grid-column:1/-1;}
+
+    .stat{padding:6px;}
+
+    .stat-label{font-size:9px;}
+    .stat-value{font-size:11px;}
+
+    .card-buttons{
+        grid-template-columns:1fr;
+        gap:5px;
+    }
+
+    .btn{
+        padding:7px 4px;
+        font-size:10px;
+    }
+
+    .detail-top{
+        grid-template-columns:1fr;
+        gap:12px;
+    }
+
+    .detail-image{min-height:170px; padding:8px;}
+
+    .detail-image img{max-height:100%; max-width:100%;}
+
+    .detail-description{font-size:13px;}
+
+    .detail-grid{grid-template-columns:1fr 1fr;}
+
+    .detail-stat{padding:8px;}
+
+    .detail-stat small{font-size:10px;}
+    .detail-stat strong{font-size:12px;}
+
+    .compare-bar{padding:8px 10px;}
+
+    .compare-inner{gap:7px;}
+
+    .compare-title{display:none;}
+
+    .compare-items{
+        gap:5px;
+        min-width:0;
+    }
+
+    .compare-item{
+        font-size:10px;
+        padding:6px 7px;
+    }
+
+    .compare-action{
+        padding:8px 9px;
+        font-size:11px;
+    }
+
+    .modal{
+        padding:8px;
+        align-items:flex-end;
+    }
+
+    .modal-box{
+        max-height:94vh;
+        border-radius:10px 10px 0 0;
+    }
+
+    .modal-header{padding:14px;}
+
+    .modal-header h2{font-size:17px;}
+
+    .modal-body{padding:14px;}
+}
+
+@media(max-width:420px){
+    .tank-grid{
+        grid-template-columns:1fr 1fr;
+        gap:6px;
+    }
+
+    .tank-image{height:125px; padding:7px;}
+
+    .tank-image img{max-height:100%; max-width:100%;}
+
+    .tank-content{padding:7px;}
+
+    .tank-name{font-size:12px;}
+
+    .badge{
+        font-size:8px;
+        padding:3px 4px;
+    }
+
+    .stat{padding:5px;}
+
+    .stat-label{font-size:8px;}
+    .stat-value{font-size:10px;}
+
+    .btn{
+        font-size:9px;
+        padding:6px 3px;
+    }
+
+    .language-select{min-width:100px;}
+}
+
+@media(max-width:340px){
+    .tank-image{height:110px; padding:6px;}
+    .tank-image img{max-height:100%; max-width:100%;}
+    .tank-name{font-size:11px;}
+    .stat-value{font-size:9px;}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="logo">
+            <div class="logo-mark">W</div>
+            <div class="logo-text">WOT<span>DB</span></div>
+        </div>
+
+        <div class="header-right">
+            <div class="header-info" id="headerInfo">
+                World of Tanks Database
+            </div>
+
+            <select
+                id="languageSelect"
+                class="language-select"
+                onchange="changeLanguage(this.value)"
+            >
+                <option value="hu">Magyar</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+    </div>
+</header>
+
+<main>
+
+    <section class="hero">
+        <h1 id="heroTitle">World of Tanks adatbázis</h1>
+        <p id="heroText">
+            Keress, szűrj és hasonlíts össze tankokat a játék adatai alapján.
+        </p>
+    </section>
+
+    <section class="filters">
+
+        <div class="filter-row">
+
+            <div class="search">
+                <input
+                    id="search"
+                    type="text"
+                    placeholder="Tank keresése..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <select id="nation">
+                <option value="">Minden nemzet</option>
+            </select>
+
+            <select id="type">
+                <option value="">Minden típus</option>
+                <option value="lightTank">Könnyű tank</option>
+                <option value="mediumTank">Közepes tank</option>
+                <option value="heavyTank">Nehéz tank</option>
+                <option value="AT-SPG">Páncélvadász</option>
+                <option value="SPG">Önjáró löveg</option>
+            </select>
+
+            <select id="tier">
+                <option value="">Minden szint</option>
+                <option value="1">I</option>
+                <option value="2">II</option>
+                <option value="3">III</option>
+                <option value="4">IV</option>
+                <option value="5">V</option>
+                <option value="6">VI</option>
+                <option value="7">VII</option>
+                <option value="8">VIII</option>
+                <option value="9">IX</option>
+                <option value="10">X</option>
+                <option value="11">XI</option>
+            </select>
+
+            <select id="premium">
+                <option value="">Minden tank</option>
+                <option value="premium">Prémium</option>
+                <option value="standard">Normál</option>
+            </select>
+
+            <select id="sort">
+                <option value="tier">Szint szerint</option>
+                <option value="name">Név szerint</option>
+                <option value="damage">Sebzés szerint</option>
+                <option value="dpm">DPM szerint</option>
+                <option value="hp">HP szerint</option>
+                <option value="penetration">Penetráció szerint</option>
+            </select>
+
+        </div>
+
+        <button
+            class="reset-btn"
+            onclick="resetFilters()"
+            id="resetButton"
+        >
+            Szűrők törlése
+        </button>
+
+    </section>
+
+    <div class="results-head">
+        <div class="results-count">
+            <span id="resultsLabel">Találatok:</span>
+            <strong id="resultCount">0</strong>
+        </div>
+    </div>
+
+    <section id="status"></section>
+
+    <section id="tankGrid" class="tank-grid"></section>
+
+    <div
+        id="empty"
+        class="empty"
+        style="display:none;"
+    >
+        Nincs a keresésnek megfelelő tank.
+    </div>
+
+</main>
+
+<footer id="footerText">
+    WOTDB – World of Tanks fan project · Nem áll kapcsolatban a Wargaminggel.
+</footer>
+
+<div class="compare-bar">
+    <div class="compare-inner">
+
+        <div class="compare-title" id="compareTitle">
+            Összehasonlítás
+        </div>
+
+        <div id="compareItems" class="compare-items">
+            <span
+                id="compareEmpty"
+                style="color:#7f8b96;font-size:12px;"
+            >
+                Válassz tankokat
+            </span>
+        </div>
+
+        <button
+            class="compare-action"
+            onclick="openCompare()"
+            id="compareButton"
+        >
+            Összehasonlítás
+        </button>
+
+    </div>
+</div>
+
+<div
+    id="detailModal"
+    class="modal"
+    onclick="closeModal(event,'detailModal')"
+>
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h2 id="detailTitle">Tank</h2>
+
+            <button
+                class="close"
+                onclick="closeSpecificModal('detailModal')"
+            >
+                ×
+            </button>
+        </div>
+
+        <div id="detailBody" class="modal-body"></div>
+
+    </div>
+</div>
+
+<div
+    id="compareModal"
+    class="modal"
+    onclick="closeModal(event,'compareModal')"
+>
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h2 id="compareModalTitle">
+                Összehasonlítás
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeSpecificModal('compareModal')"
+            >
+                ×
+            </button>
+        </div>
+
+        <div id="compareBody" class="modal-body"></div>
+
+    </div>
+</div>
+
+<script>
+/* ============================================================
+   WOTDB - FRONTEND
+   ============================================================ */
+
+const translations = {
+    hu: {
+        heroTitle: "World of Tanks adatbázis",
+        heroText: "Keress, szűrj és hasonlíts össze tankokat a játék adatai alapján.",
+        search: "Tank keresése...",
+        allNations: "Minden nemzet",
+        allTypes: "Minden típus",
+        allTiers: "Minden szint",
+        allTanks: "Minden tank",
+        premium: "Prémium",
+        standard: "Normál",
+        sortTier: "Szint szerint",
+        sortName: "Név szerint",
+        sortDamage: "Sebzés szerint",
+        sortDpm: "DPM szerint",
+        sortHp: "HP szerint",
+        sortPen: "Penetráció szerint",
+        reset: "Szűrők törlése",
+        results: "Találatok:",
+        noResults: "Nincs a keresésnek megfelelő tank.",
+        details: "Részletek",
+        compare: "Összehasonlítás",
+        selected: "✓ Kiválasztva",
+        chooseTanks: "Válassz tankokat",
+        compareNeed: "Legalább 2 tankot válassz az összehasonlításhoz.",
+        compareMax: "Legfeljebb 4 tankot hasonlíthatsz össze.",
+        basic: "Alapadatok",
+        gun: "Ágyú",
+        mobility: "Mobilitás",
+        armor: "Páncélzat",
+        engine: "Motor",
+        hp: "Életerő",
+        hullHp: "Test HP",
+        weight: "Tömeg",
+        maxAmmo: "Max. lőszer",
+        forward: "Előre",
+        backward: "Hátra",
+        radio: "Rádió",
+        gunName: "Ágyú",
+        damage: "Sebzés",
+        penetration: "Penetráció",
+        dpm: "DPM",
+        reload: "Újratöltés",
+        aim: "Célzás",
+        dispersion: "Szórás",
+        caliber: "Kaliber",
+        traverse: "Forgási sebesség",
+        depression: "Csőlehajlás",
+        elevation: "Csőemelés",
+        hullFront: "Test elöl",
+        hullSide: "Test oldal",
+        hullRear: "Test hátul",
+        turretFront: "Torony elöl",
+        turretSide: "Torony oldal",
+        turretRear: "Torony hátul",
+        power: "Teljesítmény",
+        fireChance: "Gyulladási esély",
+        viewRange: "Látótáv",
+        signalRange: "Jelátvitel",
+        noDescription: "Nincs leírás.",
+        noImage: "Nincs kép",
+        loading: "Tankadatok betöltése...",
+        loadError: "A tanks.json nem tölthető be. Ellenőrizd, hogy az index.html és a tanks.json ugyanabban a mappában van.",
+        footer: "WOTDB – World of Tanks fan project · Nem áll kapcsolatban a Wargaminggel.",
+        lightTank: "Könnyű tank",
+        mediumTank: "Közepes tank",
+        heavyTank: "Nehéz tank",
+        tankDestroyer: "Páncélvadász",
+        spg: "Önjáró löveg",
+        premiumShort: "Prémium",
+        standardShort: "Normál",
+        tier: "Szint",
+        nation: "Nemzet",
+        type: "Típus",
+        image: "Tankkép",
+        best: "legjobb",
+        worst: "legrosszabb",
+        compareHint: "A zöld a jobb, a piros a rosszabb értéket jelöli."
+    },
+
+    en: {
+        heroTitle: "World of Tanks Database",
+        heroText: "Search, filter and compare tanks using in-game data.",
+        search: "Search tanks...",
+        allNations: "All nations",
+        allTypes: "All types",
+        allTiers: "All tiers",
+        allTanks: "All tanks",
+        premium: "Premium",
+        standard: "Standard",
+        sortTier: "Sort by tier",
+        sortName: "Sort by name",
+        sortDamage: "Sort by damage",
+        sortDpm: "Sort by DPM",
+        sortHp: "Sort by HP",
+        sortPen: "Sort by penetration",
+        reset: "Reset filters",
+        results: "Results:",
+        noResults: "No tanks match your search.",
+        details: "Details",
+        compare: "Compare",
+        selected: "✓ Selected",
+        chooseTanks: "Choose tanks",
+        compareNeed: "Select at least 2 tanks to compare.",
+        compareMax: "You can compare up to 4 tanks.",
+        basic: "Basic information",
+        gun: "Gun",
+        mobility: "Mobility",
+        armor: "Armor",
+        engine: "Engine",
+        hp: "HP",
+        hullHp: "Hull HP",
+        weight: "Weight",
+        maxAmmo: "Max ammo",
+        forward: "Forward",
+        backward: "Backward",
+        radio: "Radio",
+        gunName: "Gun",
+        damage: "Damage",
+        penetration: "Penetration",
+        dpm: "DPM",
+        reload: "Reload",
+        aim: "Aim time",
+        dispersion: "Dispersion",
+        caliber: "Caliber",
+        traverse: "Traverse speed",
+        depression: "Gun depression",
+        elevation: "Gun elevation",
+        hullFront: "Hull front",
+        hullSide: "Hull side",
+        hullRear: "Hull rear",
+        turretFront: "Turret front",
+        turretSide: "Turret side",
+        turretRear: "Turret rear",
+        power: "Power",
+        fireChance: "Fire chance",
+        viewRange: "View range",
+        signalRange: "Signal range",
+        noDescription: "No description.",
+        noImage: "No image",
+        loading: "Loading tank data...",
+        loadError: "Could not load tanks.json. Make sure index.html and tanks.json are in the same folder.",
+        footer: "WOTDB – World of Tanks fan project · Not affiliated with Wargaming.",
+        lightTank: "Light tank",
+        mediumTank: "Medium tank",
+        heavyTank: "Heavy tank",
+        tankDestroyer: "Tank destroyer",
+        spg: "SPG",
+        premiumShort: "Premium",
+        standardShort: "Standard",
+        tier: "Tier",
+        nation: "Nation",
+        type: "Type",
+        image: "Tank image",
+        best: "best",
+        worst: "worst",
+        compareHint: "Green indicates the better value, red the worse value."
+    }
+};
+
+let currentLanguage =
+    localStorage.getItem("wotdbLanguage") || "hu";
+
+let t =
+    translations[currentLanguage] ||
+    translations.hu;
+
+let tanks = [];
+let filteredTanks = [];
+let compareList = [];
+
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function escapeHtml(value){
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+function valueOrZero(value){
+    const number = Number(value);
+    return Number.isFinite(number) ? number : 0;
+}
+
+function formatNumber(value, digits=0){
+    const number = valueOrZero(value);
+
+    return number.toLocaleString(
+        currentLanguage === "hu" ? "hu-HU" : "en-US",
+        {
+            maximumFractionDigits: digits
+        }
+    );
+}
+
+function getTankName(tank){
+    if(
+        tank &&
+        tank.names &&
+        tank.names[currentLanguage]
+    ){
+        return tank.names[currentLanguage];
+    }
+
+    return tank?.name || tank?.shortName || "Tank";
+}
+
+function getDescription(tank){
+    if(
+        tank &&
+        tank.descriptions &&
+        tank.descriptions[currentLanguage]
+    ){
+        return tank.descriptions[currentLanguage];
+    }
+
+    return tank?.description || t.noDescription;
+}
+
+function getStats(tank){
+    return tank?.stats || {};
+}
+
+function getGun(tank){
+    return getStats(tank).gun || {};
+}
+
+function getArmor(tank){
+    return getStats(tank).armor || {};
+}
+
+function getEngine(tank){
+    return getStats(tank).engine || {};
+}
+
+function getTurret(tank){
+    return getStats(tank).turret || {};
+}
+
+function getMobility(tank){
+    return getStats(tank).mobility || {};
+}
+
+function getRadio(tank){
+    return getStats(tank).radio || {};
+}
+
+function getImage(tank){
+    return (
+        tank?.image ||
+        tank?.icon ||
+        ""
+    );
+}
+
+function getTypeName(type){
+    const map = {
+        lightTank: t.lightTank,
+        mediumTank: t.mediumTank,
+        heavyTank: t.heavyTank,
+        "AT-SPG": t.tankDestroyer,
+        SPG: t.spg
+    };
+
+    return map[type] || type || "";
+}
+
+function getNationName(nation){
+    const names = {
+        usa: currentLanguage === "hu" ? "USA" : "USA",
+        germany: currentLanguage === "hu" ? "Németország" : "Germany",
+        ussr: currentLanguage === "hu" ? "Szovjetunió" : "USSR",
+        uk: currentLanguage === "hu" ? "Egyesült Királyság" : "U.K.",
+        japan: currentLanguage === "hu" ? "Japán" : "Japan",
+        czech: currentLanguage === "hu" ? "Csehszlovákia" : "Czechoslovakia",
+        france: currentLanguage === "hu" ? "Franciaország" : "France",
+        sweden: currentLanguage === "hu" ? "Svédország" : "Sweden",
+        china: currentLanguage === "hu" ? "Kína" : "China",
+        poland: currentLanguage === "hu" ? "Lengyelország" : "Poland",
+        italy: currentLanguage === "hu" ? "Olaszország" : "Italy",
+        china: currentLanguage === "hu" ? "Kína" : "China",
+        ukraine: currentLanguage === "hu" ? "Ukrajna" : "Ukraine"
+    };
+
+    return names[nation] || nation || "";
+}
+
+function getPremiumText(tank){
+    return tank?.premium
+        ? t.premiumShort
+        : t.standardShort;
+}
+
+function imageHtml(tank, className=""){
+    const image = getImage(tank);
+
+    if(!image){
+        return `<div class="image-fallback">${escapeHtml(t.noImage)}</div>`;
+    }
+
+    return `
+        <img
+            class="${escapeHtml(className)}"
+            src="${escapeHtml(image)}"
+            alt="${escapeHtml(getTankName(tank))}"
+            loading="lazy"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
+        >
+        <div
+            class="image-fallback"
+            style="display:none;"
+        >
+            ${escapeHtml(t.noImage)}
+        </div>
+    `;
+}
+
+
+/* ============================================================
+   LANGUAGE
+   ============================================================ */
+
+function changeLanguage(language){
+    if(!translations[language]){
+        language = "hu";
+    }
+
+    currentLanguage = language;
+    t = translations[language];
+
+    localStorage.setItem(
+        "wotdbLanguage",
+        language
+    );
+
+    document.documentElement.lang =
+        language;
+
+    document.getElementById(
+        "languageSelect"
+    ).value = language;
+
+    updateInterface();
+    applyFilters();
+}
+
+function updateInterface(){
+    document.title =
+        "WOTDB – " +
+        t.heroTitle;
+
+    document.getElementById("heroTitle").textContent =
+        t.heroTitle;
+
+    document.getElementById("heroText").textContent =
+        t.heroText;
+
+    document.getElementById("search").placeholder =
+        t.search;
+
+    document.getElementById("resultsLabel").textContent =
+        t.results;
+
+    document.getElementById("resetButton").textContent =
+        t.reset;
+
+    document.getElementById("compareTitle").textContent =
+        t.compare;
+
+    document.getElementById("compareButton").textContent =
+        t.compare;
+
+    document.getElementById("compareModalTitle").textContent =
+        t.compare;
+
+    document.getElementById("footerText").textContent =
+        t.footer;
+
+    updateFilterTexts();
+    updateCompareBar();
+}
+
+function updateFilterTexts(){
+    const nation =
+        document.getElementById("nation");
+
+    nation.options[0].textContent =
+        t.allNations;
+
+    const type =
+        document.getElementById("type");
+
+    type.options[0].textContent =
+        t.allTypes;
+
+    type.options[1].textContent =
+        t.lightTank;
+
+    type.options[2].textContent =
+        t.mediumTank;
+
+    type.options[3].textContent =
+        t.heavyTank;
+
+    type.options[4].textContent =
+        t.tankDestroyer;
+
+    type.options[5].textContent =
+        t.spg;
+
+    const tier =
+        document.getElementById("tier");
+
+    tier.options[0].textContent =
+        t.allTiers;
+
+    const premium =
+        document.getElementById("premium");
+
+    premium.options[0].textContent =
+        t.allTanks;
+
+    premium.options[1].textContent =
+        t.premium;
+
+    premium.options[2].textContent =
+        t.standard;
+
+    const sort =
+        document.getElementById("sort");
+
+    sort.options[0].textContent =
+        t.sortTier;
+
+    sort.options[1].textContent =
+        t.sortName;
+
+    sort.options[2].textContent =
+        t.sortDamage;
+
+    sort.options[3].textContent =
+        t.sortDpm;
+
+    sort.options[4].textContent =
+        t.sortHp;
+
+    sort.options[5].textContent =
+        t.sortPen;
+}
+
+
+/* ============================================================
+   FILTERS
+   ============================================================ */
+
+function populateNationFilter(){
+    const select =
+        document.getElementById("nation");
+
+    const currentValue =
+        select.value;
+
+    const nations = [
+        ...new Set(
+            tanks
+                .map(tank => tank.nation)
+                .filter(Boolean)
+        )
+    ].sort();
+
+    select.innerHTML =
+        `<option value="">${escapeHtml(t.allNations)}</option>`;
+
+    nations.forEach(nation => {
+        const option =
+            document.createElement("option");
+
+        option.value = nation;
+        option.textContent =
+            getNationName(nation);
+
+        select.appendChild(option);
+    });
+
+    if(
+        nations.includes(currentValue)
+    ){
+        select.value = currentValue;
+    }
+}
+
+function resetFilters(){
+    document.getElementById("search").value = "";
+    document.getElementById("nation").value = "";
+    document.getElementById("type").value = "";
+    document.getElementById("tier").value = "";
+    document.getElementById("premium").value = "";
+    document.getElementById("sort").value = "tier";
+
+    applyFilters();
+}
+
+function applyFilters(){
+    const search =
+        document.getElementById("search").value
+            .trim()
+            .toLowerCase();
+
+    const nation =
+        document.getElementById("nation").value;
+
+    const type =
+        document.getElementById("type").value;
+
+    const tier =
+        document.getElementById("tier").value;
+
+    const premium =
+        document.getElementById("premium").value;
+
+    const sort =
+        document.getElementById("sort").value;
+
+    filteredTanks =
+        tanks.filter(tank => {
+
+            const name =
+                getTankName(tank).toLowerCase();
+
+            const baseName =
+                String(tank.name || "").toLowerCase();
+
+            const matchesSearch =
+                !search ||
+                name.includes(search) ||
+                baseName.includes(search);
+
+            const matchesNation =
+                !nation ||
+                tank.nation === nation;
+
+            const matchesType =
+                !type ||
+                tank.type === type;
+
+            const matchesTier =
+                !tier ||
+                String(tank.tier) === tier;
+
+            const matchesPremium =
+                !premium ||
+                (
+                    premium === "premium" &&
+                    tank.premium
+                ) ||
+                (
+                    premium === "standard" &&
+                    !tank.premium
+                );
+
+            return (
+                matchesSearch &&
+                matchesNation &&
+                matchesType &&
+                matchesTier &&
+                matchesPremium
+            );
+        });
+
+    sortTanks(filteredTanks, sort);
+
+    renderTanks();
+}
+
+function sortTanks(list, sort){
+    list.sort((a,b) => {
+        const sa = getStats(a);
+        const sb = getStats(b);
+
+        const ga = getGun(a);
+        const gb = getGun(b);
+
+        if(sort === "name"){
+            return getTankName(a)
+                .localeCompare(
+                    getTankName(b),
+                    currentLanguage
+                );
+        }
+
+        if(sort === "damage"){
+            return (
+                valueOrZero(gb.damage) -
+                valueOrZero(ga.damage)
+            );
+        }
+
+        if(sort === "dpm"){
+            return (
+                valueOrZero(gb.dpm) -
+                valueOrZero(ga.dpm)
+            );
+        }
+
+        if(sort === "hp"){
+            return (
+                valueOrZero(sb.health) -
+                valueOrZero(sa.health)
+            );
+        }
+
+        if(sort === "penetration"){
+            return (
+                valueOrZero(gb.penetration) -
+                valueOrZero(ga.penetration)
+            );
+        }
+
+        const tierDiff =
+            valueOrZero(b.tier) -
+            valueOrZero(a.tier);
+
+        if(tierDiff !== 0){
+            return tierDiff;
+        }
+
+        return getTankName(a)
+            .localeCompare(
+                getTankName(b),
+                currentLanguage
+            );
+    });
+}
+
+
+/* ============================================================
+   RENDER TANKS
+   ============================================================ */
+
+function renderTanks(){
+    const grid =
+        document.getElementById("tankGrid");
+
+    const empty =
+        document.getElementById("empty");
+
+    document.getElementById("resultCount").textContent =
+        filteredTanks.length.toLocaleString(
+            currentLanguage === "hu"
+                ? "hu-HU"
+                : "en-US"
+        );
+
+    if(filteredTanks.length === 0){
+        grid.innerHTML = "";
+        empty.style.display = "block";
+        empty.textContent = t.noResults;
+        return;
+    }
+
+    empty.style.display = "none";
+
+    grid.innerHTML =
+        filteredTanks.map(
+            tank => renderTankCard(tank)
+        ).join("");
+}
+
+function renderTankCard(tank){
+    const stats = getStats(tank);
+    const gun = getGun(tank);
+
+    const selected =
+        compareList.some(
+            item => item.id === tank.id
+        );
+
+    return `
+        <article class="tank-card">
+
+            <div class="tank-image">
+                ${imageHtml(tank)}
+            </div>
+
+            <div class="tank-content">
+
+                <div
+                    class="tank-name"
+                    title="${escapeHtml(getTankName(tank))}"
+                >
+                    ${escapeHtml(getTankName(tank))}
+                </div>
+
+                <div class="tank-meta">
+                    <span class="badge tier">
+                        ${escapeHtml(t.tier)} ${escapeHtml(tank.tier)}
+                    </span>
+
+                    <span class="badge">
+                        ${escapeHtml(getTypeName(tank.type))}
+                    </span>
+
+                    <span class="badge">
+                        ${escapeHtml(getNationName(tank.nation))}
+                    </span>
+
+                    ${
+                        tank.premium
+                        ? `<span class="badge premium">${escapeHtml(t.premiumShort)}</span>`
+                        : ""
+                    }
+                </div>
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <div class="stat-label">
+                            ${escapeHtml(t.damage)}
+                        </div>
+                        <div class="stat-value">
+                            ${formatNumber(gun.damage)}
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-label">
+                            ${escapeHtml(t.dpm)}
+                        </div>
+                        <div class="stat-value">
+                            ${formatNumber(gun.dpm)}
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-label">
+                            ${escapeHtml(t.hp)}
+                        </div>
+                        <div class="stat-value">
+                            ${formatNumber(stats.health)}
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="card-buttons">
+
+                    <button
+                        class="btn primary"
+                        onclick="openDetails(${Number(tank.id)})"
+                    >
+                        ${escapeHtml(t.details)}
+                    </button>
+
+                    <button
+                        class="btn"
+                        onclick="toggleCompare(${Number(tank.id)})"
+                    >
+                        ${
+                            selected
+                            ? escapeHtml(t.selected)
+                            : escapeHtml(t.compare)
+                        }
+                    </button>
+
+                </div>
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+/* ============================================================
+   DETAILS
+   ============================================================ */
+
+function openDetails(id){
+    const tank =
+        tanks.find(item => Number(item.id) === Number(id));
+
+    if(!tank){
+        return;
+    }
+
+    const stats = getStats(tank);
+    const gun = getGun(tank);
+    const armor = getArmor(tank);
+    const engine = getEngine(tank);
+    const turret = getTurret(tank);
+    const mobility = getMobility(tank);
+    const radio = getRadio(tank);
+
+    document.getElementById("detailTitle").textContent =
+        getTankName(tank);
+
+    document.getElementById("detailBody").innerHTML = `
+
+        <div class="detail-top">
+
+            <div class="detail-image">
+                ${imageHtml(tank)}
+            </div>
+
+            <div>
+                <div class="tank-meta">
+
+                    <span class="badge tier">
+                        ${escapeHtml(t.tier)} ${escapeHtml(tank.tier)}
+                    </span>
+
+                    <span class="badge">
+                        ${escapeHtml(getTypeName(tank.type))}
+                    </span>
+
+                    <span class="badge">
+                        ${escapeHtml(getNationName(tank.nation))}
+                    </span>
+
+                    ${
+                        tank.premium
+                        ? `<span class="badge premium">${escapeHtml(t.premiumShort)}</span>`
+                        : ""
+                    }
+
+                </div>
+
+                <div class="detail-description">
+                    ${escapeHtml(getDescription(tank))}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="detail-section">
+
+            <h3>${escapeHtml(t.basic)}</h3>
+
+            <div class="detail-grid">
+
+                ${detailStat(t.hp, formatNumber(stats.health))}
+                ${detailStat(t.hullHp, formatNumber(stats.hullHealth))}
+                ${detailStat(t.weight, formatNumber(stats.weight) + " kg")}
+                ${detailStat(t.maxAmmo, formatNumber(stats.maxAmmo))}
+
+            </div>
+
+        </div>
+
+        <div class="detail-section">
+
+            <h3>${escapeHtml(t.gun)}</h3>
+
+            <div class="detail-grid">
+
+                ${detailStat(t.gunName, gun.name || "-")}
+                ${detailStat(t.damage, formatNumber(gun.damage))}
+                ${detailStat(t.penetration, formatNumber(gun.penetration))}
+                ${detailStat(t.dpm, formatNumber(gun.dpm))}
+                ${detailStat(t.reload, formatNumber(gun.reload,2) + " s")}
+                ${detailStat(t.aim, formatNumber(gun.aimTime,2) + " s")}
+                ${detailStat(t.dispersion, formatNumber(gun.dispersion,3))}
+                ${detailStat(t.caliber, formatNumber(gun.caliber) + " mm")}
+                ${detailStat(t.traverse, formatNumber(gun.traverseSpeed,2) + "°/s")}
+                ${detailStat(t.depression, formatNumber(gun.depression,2) + "°")}
+                ${detailStat(t.elevation, formatNumber(gun.elevation,2) + "°")}
+
+            </div>
+
+        </div>
+
+        <div class="detail-section">
+
+            <h3>${escapeHtml(t.mobility)}</h3>
+
+            <div class="detail-grid">
+
+                ${detailStat(t.forward, formatNumber(mobility.speedForward,2) + " km/h")}
+                ${detailStat(t.backward, formatNumber(mobility.speedBackward,2) + " km/h")}
+
+            </div>
+
+        </div>
+
+        <div class="detail-section">
+
+            <h3>${escapeHtml(t.armor)}</h3>
+
+            <div class="detail-grid">
+
+                ${detailStat(t.hullFront, formatNumber(armor.hull?.front) + " mm")}
+                ${detailStat(t.hullSide, formatNumber(armor.hull?.side) + " mm")}
+                ${detailStat(t.hullRear, formatNumber(armor.hull?.rear) + " mm")}
+                ${detailStat(t.turretFront, formatNumber(armor.turret?.front) + " mm")}
+                ${detailStat(t.turretSide, formatNumber(armor.turret?.side) + " mm")}
+                ${detailStat(t.turretRear, formatNumber(armor.turret?.rear) + " mm")}
+
+            </div>
+
+        </div>
+
+        <div class="detail-section">
+
+            <h3>${escapeHtml(t.engine)}</h3>
+
+            <div class="detail-grid">
+
+                ${detailStat("Engine", engine.name || "-")}
+                ${detailStat(t.power, formatNumber(engine.power) + " hp")}
+                ${detailStat(t.fireChance, formatNumber((engine.fireChance || 0) * 100,1) + " %")}
+
+            </div>
+
+        </div>
+
+        <div class="detail-section">
+
+            <h3>Turret / Radio</h3>
+
+            <div class="detail-grid">
+
+                ${detailStat("Turret", turret.name || "-")}
+                ${detailStat(t.viewRange, formatNumber(turret.viewRange) + " m")}
+                ${detailStat(t.radio, radio.name || "-")}
+                ${detailStat(t.signalRange, formatNumber(radio.signalRange) + " m")}
+
+            </div>
+
+        </div>
+    `;
+
+    document
+        .getElementById("detailModal")
+        .classList.add("active");
+
+    document.body.style.overflow = "hidden";
+}
+
+function detailStat(label,value){
+    return `
+        <div class="detail-stat">
+            <small>${escapeHtml(label)}</small>
+            <strong>${escapeHtml(value)}</strong>
+        </div>
+    `;
+}
+
+
+/* ============================================================
+   COMPARE
+   ============================================================ */
+
+function toggleCompare(id){
+    const index =
+        compareList.findIndex(
+            item => Number(item.id) === Number(id)
+        );
+
+    if(index >= 0){
+        compareList.splice(index,1);
+    }else{
+        if(compareList.length >= 4){
+            alert(t.compareMax);
+            return;
+        }
+
+        const tank =
+            tanks.find(
+                item => Number(item.id) === Number(id)
+            );
+
+        if(tank){
+            compareList.push(tank);
+        }
+    }
+
+    updateCompareBar();
+    renderTanks();
+}
+
+function updateCompareBar(){
+    const container =
+        document.getElementById("compareItems");
+
+    if(compareList.length === 0){
+        container.innerHTML = `
+            <span
+                id="compareEmpty"
+                style="color:#7f8b96;font-size:12px;"
+            >
+                ${escapeHtml(t.chooseTanks)}
+            </span>
+        `;
+        return;
+    }
+
+    container.innerHTML =
+        compareList.map(tank => `
+            <div class="compare-item">
+                ${escapeHtml(getTankName(tank))}
+                <span
+                    class="remove-compare"
+                    onclick="toggleCompare(${Number(tank.id)})"
+                >
+                    ×
+                </span>
+            </div>
+        `).join("");
+}
+
+function openCompare(){
+    if(compareList.length < 2){
+        alert(t.compareNeed);
+        return;
+    }
+
+    const metrics = [
+        {
+            section: t.gun,
+            label: t.damage,
+            key: "damage",
+            get: tank => getGun(tank).damage,
+            higherBetter: true,
+            unit: ""
+        },
+        {
+            section: t.gun,
+            label: t.penetration,
+            key: "penetration",
+            get: tank => getGun(tank).penetration,
+            higherBetter: true,
+            unit: ""
+        },
+        {
+            section: t.gun,
+            label: t.dpm,
+            key: "dpm",
+            get: tank => getGun(tank).dpm,
+            higherBetter: true,
+            unit: ""
+        },
+        {
+            section: t.gun,
+            label: t.reload,
+            key: "reload",
+            get: tank => getGun(tank).reload,
+            higherBetter: false,
+            unit: " s"
+        },
+        {
+            section: t.gun,
+            label: t.aim,
+            key: "aim",
+            get: tank => getGun(tank).aimTime,
+            higherBetter: false,
+            unit: " s"
+        },
+        {
+            section: t.basic,
+            label: t.hp,
+            key: "health",
+            get: tank => getStats(tank).health,
+            higherBetter: true,
+            unit: ""
+        },
+        {
+            section: t.mobility,
+            label: t.forward,
+            key: "forward",
+            get: tank => getMobility(tank).speedForward,
+            higherBetter: true,
+            unit: " km/h"
+        },
+        {
+            section: t.mobility,
+            label: t.backward,
+            key: "backward",
+            get: tank => getMobility(tank).speedBackward,
+            higherBetter: true,
+            unit: " km/h"
+        },
+        {
+            section: t.armor,
+            label: t.hullFront,
+            key: "hullFront",
+            get: tank => getArmor(tank).hull?.front,
+            higherBetter: true,
+            unit: " mm"
+        },
+        {
+            section: t.armor,
+            label: t.turretFront,
+            key: "turretFront",
+            get: tank => getArmor(tank).turret?.front,
+            higherBetter: true,
+            unit: " mm"
+        },
+        {
+            section: t.engine,
+            label: t.power,
+            key: "power",
+            get: tank => getEngine(tank).power,
+            higherBetter: true,
+            unit: " hp"
+        }
+    ];
+
+    let html = `
+        <p style="color:var(--muted);margin-top:0;">
+            ${escapeHtml(t.compareHint)}
+        </p>
+
+        <div class="table-wrap">
+
+            <table class="compare-table">
+
+                <thead>
+                    <tr>
+                        <th></th>
+
+                        ${compareList.map(tank => `
+                            <th>
+                                <div class="compare-tank-head">
+
+                                    ${
+                                        getImage(tank)
+                                        ? `<img src="${escapeHtml(getImage(tank))}" alt="${escapeHtml(getTankName(tank))}">`
+                                        : ""
+                                    }
+
+                                    <span>
+                                        ${escapeHtml(getTankName(tank))}
+                                    </span>
+
+                                </div>
+                            </th>
+                        `).join("")}
+
+                    </tr>
+                </thead>
+
+                <tbody>
+    `;
+
+    let previousSection = "";
+
+    metrics.forEach(metric => {
+
+        if(metric.section !== previousSection){
+            html += `
+                <tr class="section-row">
+                    <td colspan="${compareList.length + 1}">
+                        ${escapeHtml(metric.section)}
+                    </td>
+                </tr>
+            `;
+
+            previousSection = metric.section;
+        }
+
+        const values =
+            compareList.map(
+                tank => valueOrZero(metric.get(tank))
+            );
+
+        const validValues =
+            values.filter(
+                value => Number.isFinite(value)
+            );
+
+        let bestValue = null;
+        let worstValue = null;
+
+        if(validValues.length > 0){
+            bestValue = metric.higherBetter
+                ? Math.max(...validValues)
+                : Math.min(...validValues);
+
+            worstValue = metric.higherBetter
+                ? Math.min(...validValues)
+                : Math.max(...validValues);
+        }
+
+        html += `
+            <tr>
+                <td>${escapeHtml(metric.label)}</td>
+
+                ${values.map(value => {
+
+                    let className = "";
+
+                    if(
+                        bestValue !== null &&
+                        value === bestValue &&
+                        bestValue !== worstValue
+                    ){
+                        className = "best";
+                    }
+
+                    if(
+                        worstValue !== null &&
+                        value === worstValue &&
+                        bestValue !== worstValue
+                    ){
+                        className = "worst";
+                    }
+
+                    return `
+                        <td class="${className}">
+                            ${escapeHtml(formatNumber(value,2))}${escapeHtml(metric.unit)}
+                        </td>
+                    `;
+                }).join("")}
+
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+
+            </table>
+
+        </div>
+    `;
+
+    document.getElementById("compareBody").innerHTML =
+        html;
+
+    document
+        .getElementById("compareModal")
+        .classList.add("active");
+
+    document.body.style.overflow = "hidden";
+}
+
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+
+function closeModal(event,id){
+    if(event.target.id === id){
+        closeSpecificModal(id);
+    }
+}
+
+function closeSpecificModal(id){
+    document
+        .getElementById(id)
+        .classList.remove("active");
+
+    if(
+        !document.getElementById("detailModal").classList.contains("active") &&
+        !document.getElementById("compareModal").classList.contains("active")
+    ){
+        document.body.style.overflow = "";
+    }
+}
+
+document.addEventListener(
+    "keydown",
+    event => {
+        if(event.key !== "Escape"){
+            return;
+        }
+
+        closeSpecificModal("detailModal");
+        closeSpecificModal("compareModal");
+    }
+);
+
+
+/* ============================================================
+   LOAD DATA
+   ============================================================ */
+
+async function loadTanks(){
+    const status =
+        document.getElementById("status");
+
+    status.innerHTML = `
+        <div class="loading">
+            ${escapeHtml(t.loading)}
+        </div>
+    `;
+
+    try{
+        const response =
+            await fetch(
+                "tanks.json?cache=" + Date.now()
+            );
+
+        if(!response.ok){
+            throw new Error(
+                "HTTP " + response.status
+            );
+        }
+
+        const data =
+            await response.json();
+
+        if(!Array.isArray(data)){
+            throw new Error(
+                "A tanks.json formátuma hibás."
+            );
+        }
+
+        tanks = data;
+
+        populateNationFilter();
+
+        status.innerHTML = "";
+
+        applyFilters();
+
+    }catch(error){
+        console.error(error);
+
+        status.innerHTML = `
+            <div class="error-box">
+                <strong>${escapeHtml(t.loadError)}</strong>
+                <br><br>
+                ${escapeHtml(error.message || "")}
+            </div>
+        `;
+
+        document.getElementById("tankGrid").innerHTML = "";
+        document.getElementById("empty").style.display = "none";
+    }
+}
+
+
+/* ============================================================
+   INIT
+   ============================================================ */
+
+document.getElementById(
+    "search"
+).addEventListener(
+    "input",
+    applyFilters
+);
+
+document.getElementById(
+    "nation"
+).addEventListener(
+    "change",
+    applyFilters
+);
+
+document.getElementById(
+    "type"
+).addEventListener(
+    "change",
+    applyFilters
+);
+
+document.getElementById(
+    "tier"
+).addEventListener(
+    "change",
+    applyFilters
+);
+
+document.getElementById(
+    "premium"
+).addEventListener(
+    "change",
+    applyFilters
+);
+
+document.getElementById(
+    "sort"
+).addEventListener(
+    "change",
+    applyFilters
+);
+
+document.getElementById(
+    "languageSelect"
+).value =
+    currentLanguage;
+
+updateInterface();
+loadTanks();
+</script>
+
+</body>
+</html>
