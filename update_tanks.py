@@ -1,17 +1,46 @@
 import json
 import os
 import sys
+import time
+from pathlib import Path
+from urllib.parse import urlparse
 import requests
-
 
 # ============================================================
 # WOTDB - WORLD OF TANKS DATABASE UPDATER
 # ============================================================
+#
+# FONTOS:
+# Az Application ID-t nem tároljuk nyilvánosan ebben a fájlban.
+# Állítsd be Windowsban WOT_APPLICATION_ID néven, vagy írd be
+# ide a saját ID-dat a PASTE... helyére.
+#
+# Példa PowerShell:
+#   $env:WOT_APPLICATION_ID="SAJAT_APPLICATION_ID"
+#
+# ============================================================
 
-APPLICATION_ID = "d7244866d929b2fe3df6b976ccb68ff8"
+APPLICATION_ID = os.environ.get(
+    "WOT_APPLICATION_ID",
+    "d7244866d929b2fe3df6b976ccb68ff8"
+)
 
 API_URL = "https://api.worldoftanks.eu/wot/encyclopedia/vehicles/"
 OUTPUT_FILE = "tanks.json"
+IMAGE_DIR = Path("images")
+
+# A Wargaming API által támogatott nyelvek közül használunk.
+# Magyar (hu) ezen az API végponton nem támogatott.
+API_LANGUAGES = ["en", "de", "fr", "pl", "cs", "ru"]
+
+REQUEST_TIMEOUT = 60
+IMAGE_TIMEOUT = 30
+IMAGE_DELAY = 0.03
+
+session = requests.Session()
+session.headers.update({
+    "User-Agent": "WOTDB/1.0"
+})
 
 
 # ============================================================
@@ -37,8 +66,11 @@ def number(value, default=0):
 def clean_number(value):
     value = number(value)
 
-    if float(value).is_integer():
-        return int(value)
+    try:
+        if float(value).is_integer():
+            return int(value)
+    except (ValueError, TypeError):
+        pass
 
     return round(value, 2)
 
@@ -59,33 +91,10 @@ def first_number(*values, default=0):
 def middle_value(value, default=0):
     """
     A Wargaming API az ammo damage/penetration értékeket
-    három elemű listaként adja:
-
-        [minimum, átlag, maximum]
-
-    Példa:
-
-        damage:      [83, 110, 138]
-        penetration: [81, 108, 135]
-
-    Ezért a középső értéket használjuk.
+    jellemzően [minimum, átlag, maximum] formában adja.
+    A középső értéket használjuk.
     """
-
-    if isinstance(value, list):
-
-        if len(value) >= 3:
-            return number(value[1], default)
-
-        if len(value) == 2:
-            return number(value[0], default)
-
-        if len(value) == 1:
-            return number(value[0], default)
-
-        return default
-
-    if isinstance(value, tuple):
-
+    if isinstance(value, (list, tuple)):
         if len(value) >= 3:
             return number(value[1], default)
 
@@ -100,95 +109,238 @@ def middle_value(value, default=0):
     return number(value, default)
 
 
+def safe_text(value):
+    if value is None:
+        return ""
+
+    return str(value).strip()
+
+
 # ============================================================
 # API LEKÉRÉS
 # ============================================================
 
-def download_tanks():
-
-    print()
-    print("=" * 40)
-    print(" WARGAMING API")
-    print("=" * 40)
-    print()
-
-    print("Tankadatok lekérése...")
-    print()
-    print("Ez most szándékosan fields paraméter nélkül fut.")
-    print("Így elkerüljük az INVALID_FIELDS hibát.")
-    print()
+def download_language(language):
+    print(f"  API lekérés: {language}")
 
     params = {
         "application_id": APPLICATION_ID,
-        "language": "en"
+        "language": language
     }
 
     try:
-
-        response = requests.get(
+        response = session.get(
             API_URL,
             params=params,
-            timeout=60
+            timeout=REQUEST_TIMEOUT
         )
-
-    except requests.RequestException as e:
-
-        print()
-        print("=" * 40)
-        print(" HÁLÓZATI HIBA")
-        print("=" * 40)
-        print()
-
-        print(str(e))
-
+        response.raise_for_status()
+    except requests.RequestException as exc:
+        print(f"  HIBA ({language}): {exc}")
         return None
 
     try:
-
         result = response.json()
-
     except ValueError:
-
-        print()
-        print("=" * 40)
-        print(" API VÁLASZ HIBA")
-        print("=" * 40)
-        print()
-
-        print(
-            response.text[:3000]
-        )
-
+        print(f"  HIBA ({language}): az API nem JSON választ adott.")
+        print(response.text[:1000])
         return None
 
     if result.get("status") != "ok":
-
-        print()
-        print("=" * 40)
-        print(" WARGAMING API HIBA")
-        print("=" * 40)
-        print()
-
-        print(
-            json.dumps(
-                result,
-                indent=2,
-                ensure_ascii=False
-            )
-        )
-
+        print(f"  Wargaming API hiba ({language}):")
+        print(json.dumps(result, indent=2, ensure_ascii=False)[:4000])
         return None
 
     data = result.get("data") or {}
 
-    print()
-    print(
-        "Tankok száma az API válaszban:",
-        len(data)
-    )
-    print()
+    print(f"  OK: {len(data)} tank")
 
     return data
+
+
+def download_all_languages():
+    if not APPLICATION_ID or APPLICATION_ID == "PASTE_YOUR_APPLICATION_ID_HERE":
+        print()
+        print("=" * 60)
+        print(" HIÁNYZÓ APPLICATION ID")
+        print("=" * 60)
+        print()
+        print("Állítsd be a WOT_APPLICATION_ID környezeti változót.")
+        print("PowerShell példa:")
+        print('  $env:WOT_APPLICATION_ID="SAJAT_APPLICATION_ID"')
+        print()
+        return None
+
+    all_data = {}
+
+    for language in API_LANGUAGES:
+        data = download_language(language)
+
+        if data is None:
+            print(f"  A(z) {language} nyelv kihagyva.")
+        else:
+            all_data[language] = data
+
+        time.sleep(0.2)
+
+    if "en" not in all_data:
+        print()
+        print("Az angol API-válasz nélkül nem készíthető adatbázis.")
+        return None
+
+    return all_data
+
+
+# ============================================================
+# KÉPEK
+# ============================================================
+
+def extract_image_url(tank):
+    """
+    Elsősorban a játékbeli/full preview képet keresi.
+    Ha az API nem ad ilyet, biztonsági tartalékként a contour képet
+    használja.
+
+    A különböző API-változatok miatt több lehetséges kulcsot kezelünk.
+    """
+
+    images = tank.get("images") or {}
+
+    if isinstance(images, dict):
+        # Elsőként a teljes tankos preview / nagy kép.
+        for key in (
+            "preview",
+            "big_icon",
+            "large_icon",
+            "icon",
+            "contour_icon",
+            "contour"
+        ):
+            value = images.get(key)
+
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+
+    # Egyes válaszokban közvetlenül a tank objektumban lehet kép.
+    for key in (
+        "preview",
+        "image",
+        "image_url",
+        "icon"
+    ):
+        value = tank.get(key)
+
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+
+    # Végső tartalék: a Wargaming statikus contour kép.
+    tag = safe_text(tank.get("tag"))
+
+    if tag:
+        return (
+            "https://api.worldoftanks.eu/static/2.77.0/"
+            "wot/encyclopedia/vehicle/contour/"
+            f"{tag}.png"
+        )
+
+    return ""
+
+
+def image_extension(url, content_type=""):
+    path = urlparse(url).path.lower()
+
+    for extension in (".png", ".jpg", ".jpeg", ".webp"):
+        if path.endswith(extension):
+            return extension
+
+    content_type = (content_type or "").lower()
+
+    if "jpeg" in content_type or "jpg" in content_type:
+        return ".jpg"
+
+    if "webp" in content_type:
+        return ".webp"
+
+    return ".png"
+
+
+def download_image(url, tank_id):
+    if not url:
+        return ""
+
+    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+    try:
+        request = session.get(
+            url,
+            timeout=IMAGE_TIMEOUT
+        )
+        request.raise_for_status()
+
+        content = request.content
+
+        if not content or len(content) < 100:
+            return ""
+
+        extension = image_extension(
+            url,
+            request.headers.get("Content-Type", "")
+        )
+
+        output_path = IMAGE_DIR / f"{tank_id}{extension}"
+        output_path.write_bytes(content)
+
+        return output_path.as_posix()
+
+    except requests.RequestException as exc:
+        print(f"    Kép hiba {tank_id}: {exc}")
+        return ""
+
+    except OSError as exc:
+        print(f"    Fájl hiba {tank_id}: {exc}")
+        return ""
+
+
+def build_image_map(english_data):
+    print()
+    print("=" * 60)
+    print(" TANKKÉPEK LETÖLTÉSE")
+    print("=" * 60)
+    print()
+
+    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+    image_map = {}
+    items = list(english_data.items())
+
+    success = 0
+    failed = 0
+
+    for index, (tank_id, tank) in enumerate(items, start=1):
+        url = extract_image_url(tank)
+
+        local_path = download_image(url, tank_id)
+
+        if local_path:
+            image_map[str(tank_id)] = local_path
+            success += 1
+        else:
+            image_map[str(tank_id)] = ""
+            failed += 1
+
+        if index % 25 == 0 or index == len(items):
+            print(
+                f"  Képek: {index}/{len(items)} "
+                f"(sikeres: {success}, hibás: {failed})"
+            )
+
+        time.sleep(IMAGE_DELAY)
+
+    print()
+    print(f"  Letöltött képek: {success}")
+    print(f"  Sikertelen képek: {failed}")
+
+    return image_map
 
 
 # ============================================================
@@ -196,38 +348,12 @@ def download_tanks():
 # ============================================================
 
 def extract_ammo(ammo):
-
-    """
-    Feldolgozza a Wargaming API ammo listáját.
-
-    Példa:
-
-    [
-        {
-            "penetration": [81, 108, 135],
-            "type": "ARMOR_PIERCING",
-            "damage": [83, 110, 138]
-        }
-    ]
-
-    Visszatérés:
-
-        damage = 110
-        penetration = 108
-    """
-
     damage = 0
     penetration = 0
-
     shell_type = ""
     shell_velocity = 0
 
-    # --------------------------------------------------------
-    # Nem lista
-    # --------------------------------------------------------
-
     if not isinstance(ammo, list):
-
         return {
             "damage": 0,
             "penetration": 0,
@@ -235,60 +361,35 @@ def extract_ammo(ammo):
             "shellVelocity": 0
         }
 
-    # --------------------------------------------------------
-    # Elsődleges lövedék keresése
-    #
-    # Elsőként AP-t választunk.
-    # Ha nincs, akkor APCR / HEAT / HE stb.
-    # --------------------------------------------------------
-
     preferred_types = [
         "ARMOR_PIERCING",
         "ARMOR_PIERCING_CR",
         "HIGH_EXPLOSIVE_ANTI_TANK",
-        "HIGH_EXPLOSIVE",
-        "HOLLOW_CHARGE"
+        "HOLLOW_CHARGE",
+        "HIGH_EXPLOSIVE"
     ]
 
     selected_shell = None
 
-    # Először próbáljuk az AP-t megtalálni.
-
     for preferred in preferred_types:
-
         for shell in ammo:
-
             if not isinstance(shell, dict):
                 continue
 
             if shell.get("type") == preferred:
-
                 selected_shell = shell
-
                 break
 
         if selected_shell is not None:
             break
 
-    # Ha valamiért nincs ismert típus,
-    # használjuk az első érvényes lövedéket.
-
     if selected_shell is None:
-
         for shell in ammo:
-
             if isinstance(shell, dict):
-
                 selected_shell = shell
-
                 break
 
-    # --------------------------------------------------------
-    # Adatok kiolvasása
-    # --------------------------------------------------------
-
     if isinstance(selected_shell, dict):
-
         damage = middle_value(
             selected_shell.get("damage"),
             0
@@ -299,9 +400,8 @@ def extract_ammo(ammo):
             0
         )
 
-        shell_type = (
+        shell_type = safe_text(
             selected_shell.get("type")
-            or ""
         )
 
         shell_velocity = first_number(
@@ -324,7 +424,6 @@ def extract_ammo(ammo):
 # ============================================================
 
 def extract_gun(profile):
-
     gun = profile.get("gun") or {}
 
     if not isinstance(gun, dict):
@@ -332,21 +431,10 @@ def extract_gun(profile):
 
     ammo = profile.get("ammo") or []
 
-    # --------------------------------------------------------
-    # AMMO
-    # --------------------------------------------------------
-
     ammo_data = extract_ammo(ammo)
 
     damage = ammo_data["damage"]
     penetration = ammo_data["penetration"]
-
-    shell_type = ammo_data["shellType"]
-    shell_velocity = ammo_data["shellVelocity"]
-
-    # --------------------------------------------------------
-    # GUN
-    # --------------------------------------------------------
 
     fire_rate = first_number(
         gun.get("fire_rate"),
@@ -378,10 +466,6 @@ def extract_gun(profile):
         default=0
     )
 
-    # --------------------------------------------------------
-    # GUN ELEVATION / DEPRESSION
-    # --------------------------------------------------------
-
     depression = first_number(
         gun.get("move_down_arc"),
         default=0
@@ -392,85 +476,33 @@ def extract_gun(profile):
         default=0
     )
 
-    # --------------------------------------------------------
-    # RELOAD / FIRE RATE
-    # --------------------------------------------------------
-
     if reload_time == 0 and fire_rate > 0:
-
         reload_time = 60 / fire_rate
 
     if fire_rate == 0 and reload_time > 0:
-
         fire_rate = 60 / reload_time
-
-    # --------------------------------------------------------
-    # DPM
-    # --------------------------------------------------------
 
     dpm = 0
 
     if damage > 0 and fire_rate > 0:
-
         dpm = damage * fire_rate
 
-    # --------------------------------------------------------
-    # RESULT
-    # --------------------------------------------------------
-
     return {
-        "name": gun.get("name", ""),
-
+        "name": safe_text(gun.get("name")),
         "damage": clean_number(damage),
         "penetration": clean_number(penetration),
-
-        "reload": round(
-            reload_time,
-            2
-        ),
-
-        "fireRate": round(
-            fire_rate,
-            2
-        ),
-
-        "dpm": round(
-            dpm
-        ),
-
-        "caliber": clean_number(
-            caliber
-        ),
-
-        "aimTime": round(
-            aim_time,
-            2
-        ),
-
-        "dispersion": round(
-            dispersion,
-            3
-        ),
-
-        "traverseSpeed": round(
-            traverse_speed,
-            2
-        ),
-
-        "depression": round(
-            depression,
-            2
-        ),
-
-        "elevation": round(
-            elevation,
-            2
-        ),
-
-        "shellType": shell_type,
-
+        "reload": round(reload_time, 2),
+        "fireRate": round(fire_rate, 2),
+        "dpm": round(dpm),
+        "caliber": clean_number(caliber),
+        "aimTime": round(aim_time, 2),
+        "dispersion": round(dispersion, 3),
+        "traverseSpeed": round(traverse_speed, 2),
+        "depression": round(depression, 2),
+        "elevation": round(elevation, 2),
+        "shellType": ammo_data["shellType"],
         "shellVelocity": clean_number(
-            shell_velocity
+            ammo_data["shellVelocity"]
         )
     }
 
@@ -480,25 +512,19 @@ def extract_gun(profile):
 # ============================================================
 
 def extract_engine(profile):
-
     engine = profile.get("engine") or {}
 
     if not isinstance(engine, dict):
         engine = {}
 
     return {
-        "name": engine.get(
-            "name",
-            ""
-        ),
-
+        "name": safe_text(engine.get("name")),
         "power": clean_number(
             first_number(
                 engine.get("power"),
                 default=0
             )
         ),
-
         "fireChance": round(
             first_number(
                 engine.get("fire_chance"),
@@ -515,32 +541,25 @@ def extract_engine(profile):
 # ============================================================
 
 def extract_turret(profile):
-
     turret = profile.get("turret") or {}
 
     if not isinstance(turret, dict):
         turret = {}
 
     return {
-        "name": turret.get(
-            "name",
-            ""
-        ),
-
+        "name": safe_text(turret.get("name")),
         "health": clean_number(
             first_number(
                 turret.get("health"),
                 default=0
             )
         ),
-
         "viewRange": clean_number(
             first_number(
                 turret.get("view_range"),
                 default=0
             )
         ),
-
         "traverseSpeed": round(
             first_number(
                 turret.get("traverse_speed"),
@@ -548,7 +567,6 @@ def extract_turret(profile):
             ),
             2
         ),
-
         "weight": clean_number(
             first_number(
                 turret.get("weight"),
@@ -563,7 +581,6 @@ def extract_turret(profile):
 # ============================================================
 
 def extract_suspension(profile):
-
     suspension = profile.get("suspension") or {}
 
     if not isinstance(suspension, dict):
@@ -577,7 +594,6 @@ def extract_suspension(profile):
             ),
             2
         ),
-
         "loadLimit": clean_number(
             first_number(
                 suspension.get("load_limit"),
@@ -592,7 +608,6 @@ def extract_suspension(profile):
 # ============================================================
 
 def extract_mobility(profile):
-
     return {
         "speedForward": clean_number(
             first_number(
@@ -600,7 +615,6 @@ def extract_mobility(profile):
                 default=0
             )
         ),
-
         "speedBackward": clean_number(
             first_number(
                 profile.get("speed_backward"),
@@ -615,18 +629,13 @@ def extract_mobility(profile):
 # ============================================================
 
 def extract_radio(profile):
-
     radio = profile.get("radio") or {}
 
     if not isinstance(radio, dict):
         radio = {}
 
     return {
-        "name": radio.get(
-            "name",
-            ""
-        ),
-
+        "name": safe_text(radio.get("name")),
         "signalRange": clean_number(
             first_number(
                 radio.get("signal_range"),
@@ -641,7 +650,6 @@ def extract_radio(profile):
 # ============================================================
 
 def extract_armor(profile):
-
     armor = profile.get("armor") or {}
 
     if not isinstance(armor, dict):
@@ -664,14 +672,12 @@ def extract_armor(profile):
                     default=0
                 )
             ),
-
             "side": clean_number(
                 first_number(
                     hull.get("side"),
                     default=0
                 )
             ),
-
             "rear": clean_number(
                 first_number(
                     hull.get("rear"),
@@ -679,7 +685,6 @@ def extract_armor(profile):
                 )
             )
         },
-
         "turret": {
             "front": clean_number(
                 first_number(
@@ -687,14 +692,12 @@ def extract_armor(profile):
                     default=0
                 )
             ),
-
             "side": clean_number(
                 first_number(
                     turret.get("side"),
                     default=0
                 )
             ),
-
             "rear": clean_number(
                 first_number(
                     turret.get("rear"),
@@ -709,83 +712,97 @@ def extract_armor(profile):
 # TANK ÁTALAKÍTÁSA
 # ============================================================
 
-def convert_tank(tank_id, tank):
-
-    profile = tank.get(
-        "default_profile"
-    ) or {}
+def convert_tank(
+    tank_id,
+    english_tank,
+    language_data,
+    image_map
+):
+    profile = english_tank.get("default_profile") or {}
 
     if not isinstance(profile, dict):
         profile = {}
 
-    # --------------------------------------------------------
-    # ALAPADATOK
-    # --------------------------------------------------------
-
-    name = tank.get(
-        "name",
-        ""
+    name = safe_text(
+        english_tank.get("name")
     )
 
-    short_name = (
-        tank.get("short_name")
+    short_name = safe_text(
+        english_tank.get("short_name")
         or name
     )
 
-    nation = tank.get(
-        "nation",
-        ""
+    nation = safe_text(
+        english_tank.get("nation")
     )
 
-    tier = tank.get(
-        "tier",
-        0
+    tier = int(
+        number(
+            english_tank.get("tier"),
+            0
+        )
     )
 
-    tank_type = tank.get(
-        "type",
-        ""
+    tank_type = safe_text(
+        english_tank.get("type")
     )
 
     premium = bool(
-        tank.get(
-            "is_premium",
-            False
-        )
+        english_tank.get("is_premium", False)
     )
 
     gift = bool(
-        tank.get(
-            "is_gift",
-            False
-        )
+        english_tank.get("is_gift", False)
     )
+
+    description = safe_text(
+        english_tank.get("description")
+    )
+
+    # --------------------------------------------------------
+    # NYELVI ADATOK
+    # --------------------------------------------------------
+
+    names = {}
+    descriptions = {}
+
+    for language, data in language_data.items():
+        localized = data.get(str(tank_id))
+
+        if not isinstance(localized, dict):
+            continue
+
+        localized_name = safe_text(
+            localized.get("name")
+        )
+
+        localized_description = safe_text(
+            localized.get("description")
+        )
+
+        if localized_name:
+            names[language] = localized_name
+
+        if localized_description:
+            descriptions[language] = localized_description
+
+    if "en" not in names and name:
+        names["en"] = name
+
+    if "en" not in descriptions and description:
+        descriptions["en"] = description
 
     # --------------------------------------------------------
     # KÉP
     # --------------------------------------------------------
 
-    images = tank.get(
-        "images"
-    ) or {}
-
-    icon = ""
-
-    if isinstance(images, dict):
-
-        icon = images.get(
-            "contour_icon",
-            ""
-        )
-
-    # --------------------------------------------------------
-    # LEÍRÁS
-    # --------------------------------------------------------
-
-    description = tank.get(
-        "description",
+    image = image_map.get(
+        str(tank_id),
         ""
     )
+
+    # A régi "icon" mezőt is megtartjuk kompatibilitás miatt.
+    icon = image
 
     # --------------------------------------------------------
     # HP
@@ -805,37 +822,13 @@ def convert_tank(tank_id, tank):
     # STATOK
     # --------------------------------------------------------
 
-    armor = extract_armor(
-        profile
-    )
-
-    gun = extract_gun(
-        profile
-    )
-
-    engine = extract_engine(
-        profile
-    )
-
-    turret = extract_turret(
-        profile
-    )
-
-    suspension = extract_suspension(
-        profile
-    )
-
-    mobility = extract_mobility(
-        profile
-    )
-
-    radio = extract_radio(
-        profile
-    )
-
-    # --------------------------------------------------------
-    # TÖMEG
-    # --------------------------------------------------------
+    armor = extract_armor(profile)
+    gun = extract_gun(profile)
+    engine = extract_engine(profile)
+    turret = extract_turret(profile)
+    suspension = extract_suspension(profile)
+    mobility = extract_mobility(profile)
+    radio = extract_radio(profile)
 
     weight = first_number(
         profile.get("weight"),
@@ -852,65 +845,33 @@ def convert_tank(tank_id, tank):
         default=0
     )
 
-    # --------------------------------------------------------
-    # RESULT
-    # --------------------------------------------------------
-
     return {
         "id": int(tank_id),
-
         "name": name,
         "shortName": short_name,
-
+        "names": names,
         "nation": nation,
-        "tier": int(
-            number(tier)
-        ),
-
+        "tier": tier,
         "type": tank_type,
-
         "premium": premium,
         "gift": gift,
-
+        "image": image,
         "icon": icon,
-
         "description": description,
-
+        "descriptions": descriptions,
         "stats": {
-
-            "health": clean_number(
-                health
-            ),
-
-            "hullHealth": clean_number(
-                hull_health
-            ),
-
+            "health": clean_number(health),
+            "hullHealth": clean_number(hull_health),
             "armor": armor,
-
             "gun": gun,
-
             "engine": engine,
-
             "turret": turret,
-
             "suspension": suspension,
-
             "mobility": mobility,
-
             "radio": radio,
-
-            "weight": clean_number(
-                weight
-            ),
-
-            "maxWeight": clean_number(
-                max_weight
-            ),
-
-            "maxAmmo": clean_number(
-                max_ammo
-            )
+            "weight": clean_number(weight),
+            "maxWeight": clean_number(max_weight),
+            "maxAmmo": clean_number(max_ammo)
         }
     }
 
@@ -919,63 +880,50 @@ def convert_tank(tank_id, tank):
 # TELJES ADATBÁZIS
 # ============================================================
 
-def convert_tanks(data):
+def convert_tanks(all_data, image_map):
+    english_data = all_data["en"]
 
-    print(
-        "Tankok feldolgozása..."
-    )
+    print()
+    print("=" * 60)
+    print(" TANKOK FELDOLGOZÁSA")
+    print("=" * 60)
+    print()
 
     tanks = []
 
     items = list(
-        data.items()
+        english_data.items()
     )
 
-    for index, (tank_id, tank) in enumerate(
+    for index, (tank_id, english_tank) in enumerate(
         items,
         start=1
     ):
-
         try:
-
             converted = convert_tank(
                 tank_id,
-                tank
+                english_tank,
+                all_data,
+                image_map
             )
 
-            tanks.append(
-                converted
-            )
+            tanks.append(converted)
 
-        except Exception as e:
-
+        except Exception as exc:
+            print()
+            print(f"Hiba tank feldolgozásakor: {tank_id}")
+            print(str(exc))
             print()
 
+        if index % 100 == 0 or index == len(items):
             print(
-                "Hiba tank feldolgozásakor:"
+                f"  Feldolgozás: {index}/{len(items)}"
             )
 
-            print(
-                "ID:",
-                tank_id
-            )
-
-            print(
-                "Hiba:",
-                str(e)
-            )
-
-            print()
-
-        if (
-            index % 100 == 0
-            or
-            index == len(items)
-        ):
-
-            print(
-                f"  {index}/{len(items)}"
-            )
+    # Stabil sorrend ID alapján.
+    tanks.sort(
+        key=lambda tank: tank.get("id", 0)
+    )
 
     return tanks
 
@@ -985,119 +933,44 @@ def convert_tanks(data):
 # ============================================================
 
 def validate_tanks(tanks):
-
     print()
-    print("=" * 40)
+    print("=" * 60)
     print(" WOTDB ELLENŐRZÉS")
-    print("=" * 40)
+    print("=" * 60)
     print()
 
-    total = len(
-        tanks
+    total = len(tanks)
+
+    image_count = sum(
+        1
+        for tank in tanks
+        if tank.get("image")
     )
 
-    stats_count = 0
-    hp_count = 0
-    gun_count = 0
-    armor_count = 0
-    dpm_count = 0
-
-    for tank in tanks:
-
-        stats = tank.get(
-            "stats"
-        ) or {}
-
-        if stats:
-
-            stats_count += 1
-
-        if number(
-            stats.get(
-                "health"
-            )
-        ) > 0:
-
-            hp_count += 1
-
-        gun = stats.get(
-            "gun"
-        ) or {}
-
-        if (
-            number(
-                gun.get(
-                    "damage"
-                )
-            ) > 0
-            and
-            number(
-                gun.get(
-                    "penetration"
-                )
-            ) > 0
-        ):
-
-            gun_count += 1
-
-        armor = stats.get(
-            "armor"
-        ) or {}
-
-        if armor:
-
-            armor_count += 1
-
-        if number(
-            gun.get(
-                "dpm"
-            )
-        ) > 0:
-
-            dpm_count += 1
-
-    print(
-        f"Összes tank:       {total}"
+    stats_count = sum(
+        1
+        for tank in tanks
+        if isinstance(tank.get("stats"), dict)
     )
 
-    print(
-        f"Stats objektum:    {stats_count}"
+    translation_count = sum(
+        1
+        for tank in tanks
+        if isinstance(tank.get("names"), dict)
+        and len(tank.get("names")) > 1
     )
 
-    print(
-        f"HP adat:           {hp_count}"
-    )
-
-    print(
-        f"Löveg adat:        {gun_count}"
-    )
-
-    print(
-        f"Páncél adat:       {armor_count}"
-    )
-
-    print(
-        f"DPM adat:          {dpm_count}"
-    )
-
-    # --------------------------------------------------------
-    # MINTA
-    # --------------------------------------------------------
-
+    print(f"  Tankok száma:       {total}")
+    print(f"  Képekkel:           {image_count}")
+    print(f"  Stat blokkal:       {stats_count}")
+    print(f"  Többnyelvű névvel:  {translation_count}")
     print()
-    print(
-        "MINTA TANK:"
-    )
 
-    if tanks:
+    if total == 0:
+        print("HIBA: 0 tank került az adatbázisba.")
+        return False
 
-        print(
-            json.dumps(
-                tanks[0],
-                indent=2,
-                ensure_ascii=False
-            )
-        )
+    return True
 
 
 # ============================================================
@@ -1105,21 +978,18 @@ def validate_tanks(tanks):
 # ============================================================
 
 def save_tanks(tanks):
-
     print()
-    print("=" * 40)
-    print(" JSON MENTÉS")
-    print("=" * 40)
+    print("=" * 60)
+    print(" JSON MENTÉSE")
+    print("=" * 60)
     print()
 
     try:
-
         with open(
             OUTPUT_FILE,
             "w",
             encoding="utf-8"
         ) as file:
-
             json.dump(
                 tanks,
                 file,
@@ -1127,49 +997,11 @@ def save_tanks(tanks):
                 indent=2
             )
 
-    except OSError as e:
-
-        print(
-            "Mentési hiba:"
-        )
-
-        print(
-            str(e)
-        )
-
+    except OSError as exc:
+        print(f"Mentési hiba: {exc}")
         return False
 
-    file_size = os.path.getsize(
-        OUTPUT_FILE
-    )
-
-    print(
-        "Sikeres mentés!"
-    )
-
-    print()
-
-    print(
-        "Fájl:",
-        os.path.abspath(
-            OUTPUT_FILE
-        )
-    )
-
-    print(
-        "Méret:",
-        round(
-            file_size / 1024,
-            1
-        ),
-        "KB"
-    )
-
-    print(
-        "Tankok:",
-        len(tanks)
-    )
-
+    print(f"  Elkészült: {OUTPUT_FILE}")
     return True
 
 
@@ -1178,107 +1010,60 @@ def save_tanks(tanks):
 # ============================================================
 
 def main():
-
     print()
-    print("=" * 40)
-    print(" WOTDB TANK DATABASE UPDATER")
-    print("=" * 40)
+    print("=" * 60)
+    print(" WOTDB - WORLD OF TANKS DATABASE")
+    print(" Adatbázis frissítő")
+    print("=" * 60)
     print()
 
-    # --------------------------------------------------------
-    # APPLICATION ID ELLENŐRZÉS
-    # --------------------------------------------------------
+    print("1/4 - Wargaming API lekérések...")
+    all_data = download_all_languages()
 
-    if (
-        not APPLICATION_ID
-        or
-        APPLICATION_ID
-        == "IDE_JON_A_SAJAT_APPLICATION_ID"
-    ):
-
-        print(
-            "HIBA:"
-        )
-
+    if all_data is None:
         print()
-
-        print(
-            "Az APPLICATION_ID nincs beállítva."
-        )
-
-        print()
-
-        print(
-            "Nyisd meg az update_tanks.py fájlt,"
-        )
-
-        print(
-            "és írd be a saját Wargaming Application ID-det."
-        )
-
+        print("A frissítés sikertelen.")
         sys.exit(1)
 
-    # --------------------------------------------------------
-    # API
-    # --------------------------------------------------------
+    english_data = all_data["en"]
 
-    data = download_tanks()
+    print()
+    print("2/4 - Játékbeli tankképek letöltése...")
+    image_map = build_image_map(
+        english_data
+    )
 
-    if not data:
-
-        print()
-
-        print(
-            "Az adatlekérés sikertelen."
-        )
-
-        sys.exit(1)
-
-    # --------------------------------------------------------
-    # ÁTALAKÍTÁS
-    # --------------------------------------------------------
-
+    print()
+    print("3/4 - Tankadatok feldolgozása...")
     tanks = convert_tanks(
-        data
+        all_data,
+        image_map
     )
 
-    # --------------------------------------------------------
-    # ELLENŐRZÉS
-    # --------------------------------------------------------
-
-    validate_tanks(
-        tanks
-    )
-
-    # --------------------------------------------------------
-    # MENTÉS
-    # --------------------------------------------------------
-
-    success = save_tanks(
-        tanks
-    )
-
-    if not success:
-
+    if not validate_tanks(tanks):
+        print()
+        print("A frissítés megszakadt.")
         sys.exit(1)
 
     print()
-    print("=" * 40)
-    print(" KÉSZ!")
-    print("=" * 40)
-    print()
+    print("4/4 - tanks.json mentése...")
 
-    print(
-        "A tanks.json elkészült."
-    )
+    if not save_tanks(tanks):
+        sys.exit(1)
 
     print()
+    print("=" * 60)
+    print(" KÉSZ")
+    print("=" * 60)
+    print()
+    print("Az index.html most már a helyi images/ mappából")
+    print("fogja betölteni a tankképeket.")
+    print()
+    print("Készült:")
+    print(f"  - {OUTPUT_FILE}")
+    print(f"  - {IMAGE_DIR}/")
+    print()
 
-
-# ============================================================
-# INDÍTÁS
-# ============================================================
 
 if __name__ == "__main__":
-
     main()
